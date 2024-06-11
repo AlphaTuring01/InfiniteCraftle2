@@ -3,6 +3,7 @@ package lab.prog.infinitecraftle;
 import android.content.ClipData;
 import android.os.Bundle;
 import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -27,21 +28,33 @@ public class MainActivity extends AppCompatActivity {
         TextView elementEarth = findViewById(R.id.element_earth);
         Button buttonReset = findViewById(R.id.button_reset);
 
-        elementWater.setOnLongClickListener(longClickListener);
-        elementFire.setOnLongClickListener(longClickListener);
-        elementWind.setOnLongClickListener(longClickListener);
-        elementEarth.setOnLongClickListener(longClickListener);
+        elementWater.setOnTouchListener(touchListener);
+        elementFire.setOnTouchListener(touchListener);
+        elementWind.setOnTouchListener(touchListener);
+        elementEarth.setOnTouchListener(touchListener);
 
         craftingArea.setOnDragListener(dragListener);
 
+        buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
     }
 
-    private View.OnLongClickListener longClickListener = v -> {
-        ClipData data = ClipData.newPlainText("", "");
-        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-        v.startDragAndDrop(data, shadowBuilder, v, 0);
-        return true;
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                v.startDragAndDrop(data, shadowBuilder, v, 0);
+
+                // Make the view invisible if it is being dragged from the crafting area
+                if (v.getParent() == craftingArea) {
+                    v.setVisibility(View.INVISIBLE);
+                }
+                return true;
+            }
+            return false;
+        }
     };
 
     private View.OnDragListener dragListener = (v, event) -> {
@@ -49,7 +62,12 @@ public class MainActivity extends AppCompatActivity {
             case DragEvent.ACTION_DRAG_STARTED:
             case DragEvent.ACTION_DRAG_ENTERED:
             case DragEvent.ACTION_DRAG_EXITED:
+                return true;
             case DragEvent.ACTION_DRAG_ENDED:
+                View draggedView = (View) event.getLocalState();
+                if (draggedView.getParent() == craftingArea) {
+                    draggedView.setVisibility(View.VISIBLE); // Make the view visible again if it was in the crafting area
+                }
                 return true;
             case DragEvent.ACTION_DROP:
                 View view = (View) event.getLocalState();
@@ -70,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                     layoutParams.leftMargin = (int) event.getX() - (view.getWidth() / 2);
                     layoutParams.topMargin = (int) event.getY() - (view.getHeight() / 2);
 
-                    clonedView.setOnLongClickListener(longClickListener);
+                    clonedView.setOnTouchListener(touchListener);
                     craftingArea.addView(clonedView, layoutParams);
                     clonedView.setVisibility(View.VISIBLE);
                 }
