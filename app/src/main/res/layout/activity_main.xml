@@ -1,19 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <!-- Header with NEAL.FUN -->
     <TextView
+        android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="NEAL.FUN"
+        android:textSize="24sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Main crafting area -->
+    <FrameLayout
+        android:id="@+id/crafting_area"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#EEEEEE"/>
+
+    <!-- Drag elements to craft text -->
+    <TextView
+        android:id="@+id/drag_elements"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drag elements to craft →"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"/>
+
+    <!-- Elements to craft -->
+    <LinearLayout
+        android:id="@+id/elements_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_margin="16dp">
+
+        <TextView
+            android:id="@+id/element_water"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💧 Water"
+            android:padding="10dp"
+            android:background="@drawable/element_background"/>
+
+        <TextView
+            android:id="@+id/element_fire"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔥 Fire"
+            android:padding="10dp"
+            android:background="@drawable/element_background"
+            android:layout_marginStart="8dp"/>
+
+        <TextView
+            android:id="@+id/element_wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💨 Wind"
+            android:padding="10dp"
+            android:background="@drawable/element_background"
+            android:layout_marginStart="8dp"/>
+
+        <TextView
+            android:id="@+id/element_earth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌍 Earth"
+            android:padding="10dp"
+            android:background="@drawable/element_background"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Reset button -->
+    <Button
+        android:id="@+id/button_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+</LinearLayout>
