@@ -29,54 +29,24 @@
         android:id="@+id/drag_elements"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Drag elements to craft →"
+        android:text="Drag elements to craft"
         android:layout_gravity="center_horizontal"
         android:layout_margin="16dp"/>
 
-    <!-- Elements to craft -->
-    <LinearLayout
-        android:id="@+id/elements_layout"
+    <!-- Horizontal scrollable container for elements -->
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_margin="16dp">
+        android:layout_margin="16dp"
+        android:scrollbars="none">
 
-        <TextView
-            android:id="@+id/element_water"
+        <LinearLayout
+            android:id="@+id/elements_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="💧 Water"
-            android:padding="10dp"
-            android:background="@drawable/element_background"/>
-
-        <TextView
-            android:id="@+id/element_fire"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔥 Fire"
-            android:padding="10dp"
-            android:background="@drawable/element_background"
-            android:layout_marginStart="8dp"/>
-
-        <TextView
-            android:id="@+id/element_wind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="💨 Wind"
-            android:padding="10dp"
-            android:background="@drawable/element_background"
-            android:layout_marginStart="8dp"/>
-
-        <TextView
-            android:id="@+id/element_earth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🌍 Earth"
-            android:padding="10dp"
-            android:background="@drawable/element_background"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:gravity="center"/>
+    </HorizontalScrollView>
 
     <!-- Reset button -->
     <Button
@@ -88,6 +58,4 @@
         android:padding="8dp"
         android:background="?attr/selectableItemBackground"
         android:textColor="@android:color/black"/>
-
 </LinearLayout>
-    <!--        android:drawableLeft="@drawable/ic_broom"-->

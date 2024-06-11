@@ -2,18 +2,22 @@ package lab.prog.infinitecraftle;
 
 import android.content.ClipData;
 import android.os.Bundle;
+import android.graphics.drawable.Drawable;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     private FrameLayout craftingArea;
+    private LinearLayout elementsLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,22 +25,39 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         craftingArea = findViewById(R.id.crafting_area);
+        elementsLayout = findViewById(R.id.elements_layout);
 
-        TextView elementWater = findViewById(R.id.element_water);
-        TextView elementFire = findViewById(R.id.element_fire);
-        TextView elementWind = findViewById(R.id.element_wind);
-        TextView elementEarth = findViewById(R.id.element_earth);
-        Button buttonReset = findViewById(R.id.button_reset);
-
-        elementWater.setOnTouchListener(touchListener);
-        elementFire.setOnTouchListener(touchListener);
-        elementWind.setOnTouchListener(touchListener);
-        elementEarth.setOnTouchListener(touchListener);
+        // Add elements dynamically
+        addElement("💧 Water", R.drawable.element_background);
+        addElement("🔥 Fire", R.drawable.element_background);
+        addElement("💨 Wind", R.drawable.element_background);
+        addElement("🌍 Earth", R.drawable.element_background);
 
         craftingArea.setOnDragListener(dragListener);
 
+        Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
+    }
+
+    private void addElement(String text, int backgroundResId) {
+        TextView element = new TextView(this);
+        element.setText(text);
+        element.setPadding(20, 20, 20, 20);
+        element.setBackground(ContextCompat.getDrawable(this, backgroundResId));
+        element.setTextSize(18);
+        element.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+        element.setGravity(View.TEXT_ALIGNMENT_CENTER);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMarginStart(16);
+        params.setMarginEnd(16);
+        element.setLayoutParams(params);
+        element.setOnTouchListener(touchListener);
+        elementsLayout.addView(element);
     }
 
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
@@ -60,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
     private View.OnDragListener dragListener = (v, event) -> {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED:
+                return true;
             case DragEvent.ACTION_DRAG_ENTERED:
+                return true;
             case DragEvent.ACTION_DRAG_EXITED:
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
@@ -80,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                     // Clone the view being dragged
                     TextView clonedView = new TextView(this);
                     clonedView.setText(((TextView) view).getText());
-                    clonedView.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+                    clonedView.setPadding(30, 30, 30, 30); // Increase padding for larger size
+                    clonedView.setTextSize(24); // Increase text size
                     clonedView.setBackground(view.getBackground());
 
                     FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
