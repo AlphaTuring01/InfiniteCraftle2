@@ -51,9 +51,9 @@ public class WinActivity extends AppCompatActivity {
             finish();
         });
 
-        int red = ContextCompat.getColor(this, R.drawable.colors.red);
-        int blue = ContextCompat.getColor(this, R.drawable.colors.blue);
-        int yellow = ContextCompat.getColor(this, R.drawable.colors.yellow);
+        int red = ContextCompat.getColor(this, R.color.red);
+        int blue = ContextCompat.getColor(this, R.color.blue);
+        int yellow = ContextCompat.getColor(this, R.color.yellow);
 
         KonfettiView konfettiView = findViewById(R.id.konfettiView);
         EmitterConfig emitterConfig = new Emitter(5L, TimeUnit.SECONDS).perSecond(50);

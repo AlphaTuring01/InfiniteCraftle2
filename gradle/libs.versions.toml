@@ -11,6 +11,8 @@ activity = "1.8.0"
 constraintlayout = "2.1.4"
 okhttpVersion = "5.0.0-alpha.14"
 gson = "2.11.0"
+kotlin = "2.0.0"
+coreKtx = "1.13.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,8 +26,10 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 okhttp3-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttpVersion" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.dto.CraftRequest;
+import lab.prog.infinitecraftle.dto.CraftResponse;
 import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
 
@@ -41,7 +42,7 @@ public class HomeActivity extends AppCompatActivity {
 
     // Attributes for the current game
     private Game game;
-
+    private ArrayList<String> dateList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +56,7 @@ public class HomeActivity extends AppCompatActivity {
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
         game = loginResponse.getGame();
+        dateList = loginResponse.getListDates();
         AddAllElements();
 
         Button buttonReset = findViewById(R.id.button_reset);
@@ -79,11 +81,21 @@ public class HomeActivity extends AppCompatActivity {
                 addElement(emoji, name);
                 break;
             }
+            if(craftResponse.getGame().isWin() && !game.isWin()){
+                moveToWinActivity(craftResponse);
+            }
         });
         craftViewModel.getErrorLiveData().observe(this, error -> {
         });
     }
-
+    private void moveToWinActivity(CraftResponse response) {
+        Intent intent = new Intent(HomeActivity.this, WinActivity.class);
+        intent.putExtra("dateList", dateList);
+        intent.putExtra("score", response.getGame().getScore());
+        intent.putExtra("time", response.getGame().getTimeMillis());
+        startActivity(intent);
+        finish();
+    }
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
