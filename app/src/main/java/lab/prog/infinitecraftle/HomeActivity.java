@@ -21,7 +21,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,12 +61,12 @@ public class HomeActivity extends AppCompatActivity {
         bin = findViewById(R.id.bin);
         bin.setId(newViewIndex);
         newViewIndex++;
-        //rootLayout = findViewById(R.id.root_layout);
-        //rootLayout.setOnDragListener(dragListener);
-
+        TextView dateView = findViewById(R.id.wordViewDate);
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
         wordView.setText(loginResponse.getElementDay().getName());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
+        dateView.setText(formatter.format(new Date()));
         game = loginResponse.getGame();
         AddAllElements();
 
@@ -130,7 +133,6 @@ public class HomeActivity extends AppCompatActivity {
         element.setTextColor(ContextCompat.getColor(this, android.R.color.black));
         element.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
-        // Medir a altura do texto após definir o texto
         element.post(new Runnable() {
             @Override
             public void run() {

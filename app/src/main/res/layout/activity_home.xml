@@ -53,7 +53,7 @@
         <TextView
             android:id="@+id/wordViewText"
             android:text="Palavra do dia:"
-            android:layout_width="48dp"
+            android:layout_width="54dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:layout_marginTop="0dp"
@@ -77,13 +77,13 @@
             android:contentDescription="Centralized and Bigger TextView"/>
 
         <TextView
-            android:id="@+id/wordViewTextInvisible"
-            android:text=""
-            android:layout_width="48dp"
+            android:id="@+id/wordViewDate"
+            android:text="Data"
+            android:layout_width="54dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="12dp"
             android:textColor="@android:color/black"/>
     </LinearLayout>
 
