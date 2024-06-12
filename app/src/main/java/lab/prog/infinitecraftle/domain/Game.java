@@ -32,6 +32,10 @@ public class Game {
         this.elements = new ArrayList<>();
         this.targetElement = new Element();
     }
+
+    public Game(ArrayList<Element> elements){
+        this.elements = elements;
+    }
     String DateToString(Date date){
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return formatter.format(date);
