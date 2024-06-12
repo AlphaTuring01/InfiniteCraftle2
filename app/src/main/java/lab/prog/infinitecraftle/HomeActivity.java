@@ -2,8 +2,10 @@ package lab.prog.infinitecraftle;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.MotionEvent;
@@ -115,42 +117,51 @@ public class HomeActivity extends AppCompatActivity {
     private void addElement(String emoji, String name) {
         String elementText = emoji + " " + name;
 
+        // Verifica se o elemento já está presente
         for (int i = 0; i < elementsLayout.getChildCount(); i++) {
             View child = elementsLayout.getChildAt(i);
             if (child instanceof TextView) {
                 TextView existingElement = (TextView) child;
                 if (existingElement.getText().toString().equals(elementText)) {
-                    return; // Element is already present, so do not add it again
+                    return; // Elemento já está presente, não adiciona novamente
                 }
             }
         }
 
+        // Cria um novo TextView para o elemento
         TextView element = new TextView(this);
         element.setText(elementText);
         element.setPadding(20, 20, 20, 20);
-        element.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
-        element.setTextSize(18); // Tamanho do texto mantido como 18sp
+        element.setTextSize(18);
         element.setTextColor(ContextCompat.getColor(this, android.R.color.black));
         element.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
-        element.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT, // Largura definida como WRAP_CONTENT
-                        LinearLayout.LayoutParams.WRAP_CONTENT  // Altura definida com base na altura do texto
-                );
-                params.setMarginStart(16);
-                params.setMarginEnd(16);
-                element.setLayoutParams(params);
-            }
-        });
+        // Define o contorno (borda) arredondada
+        int strokeWidth = 3; // Largura da borda em pixels
+        int strokeColor = ContextCompat.getColor(this, android.R.color.black); // Cor da borda
+        int cornerRadius = 20; // Raio dos cantos em pixels
+        GradientDrawable borderDrawable = new GradientDrawable();
+        borderDrawable.setStroke(strokeWidth, strokeColor);
+        borderDrawable.setColor(Color.WHITE); // Cor de fundo
+        borderDrawable.setCornerRadius(cornerRadius); // Raio dos cantos
+        element.setBackground(borderDrawable);
+
+        // Adiciona o TextView ao LinearLayout
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMarginStart(16);
+        layoutParams.setMarginEnd(16);
+        element.setLayoutParams(layoutParams);
 
         element.setOnTouchListener(touchListener);
         element.setId(newViewIndex);
         newViewIndex++;
         elementsLayout.addView(element);
     }
+
+
+
 
 
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
@@ -201,9 +212,18 @@ public class HomeActivity extends AppCompatActivity {
                     // Clone the view being dragged
                     TextView clonedTextView = new TextView(this);
                     clonedTextView.setText(((TextView) view).getText());
-                    clonedTextView.setPadding(30, 30, 30, 30); // Increase padding for larger size
-                    clonedTextView.setTextSize(24); // Increase text size
-                    clonedTextView.setBackground(view.getBackground());
+                    clonedTextView.setTextSize(18);
+                    clonedTextView.setPadding(20, 20, 20, 20);// Increase text size
+                    int strokeWidth = 3; // Largura da borda em pixels
+                    int strokeColor = ContextCompat.getColor(this, android.R.color.black); // Cor da borda
+                    int cornerRadius = 20; // Raio dos cantos em pixels
+                    GradientDrawable borderDrawable = new GradientDrawable();
+                    borderDrawable.setStroke(strokeWidth, strokeColor);
+                    borderDrawable.setColor(Color.WHITE); // Cor de fundo
+                    borderDrawable.setCornerRadius(cornerRadius); // Raio dos cantos
+                    clonedTextView.setBackground(borderDrawable);
+
+                    //clonedTextView.setBackground(view.getBackground());
 
                     FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -243,8 +263,22 @@ public class HomeActivity extends AppCompatActivity {
         return mainRect.intersect(binRect);
     }
 
+    private boolean isOff(View mainView) {
+        Rect mainRect = new Rect();
+        mainView.getGlobalVisibleRect(mainRect);
+
+        Rect craftingAreaRect = new Rect();
+        craftingArea.getGlobalVisibleRect(craftingAreaRect);
+
+        // Verifica se algum canto da mainView está fora do craftingArea
+        return mainRect.left < craftingAreaRect.left ||
+                mainRect.top < craftingAreaRect.top ||
+                mainRect.right > craftingAreaRect.right ||
+                mainRect.bottom > craftingAreaRect.bottom;
+    }
+
     private boolean isCloseToOtherView(TextView view) {
-        for (int i = 1; i < craftingArea.getChildCount(); i++) {
+        for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             View child = craftingArea.getChildAt(i);
             if(!(child instanceof TextView)) continue;
             int a = child.getId();
@@ -282,8 +316,8 @@ public class HomeActivity extends AppCompatActivity {
         return input.trim().split("\\s+")[1];
     }
     private void resetCraftingArea() {
-        for(int i=1; i<craftingArea.getChildCount(); i++){
-            craftingArea.removeView(craftingArea.getChildAt(i));
+        for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
+            craftingArea.removeViewAt(i);
         }
     }
 }
