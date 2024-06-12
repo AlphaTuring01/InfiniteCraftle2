@@ -1,5 +1,6 @@
 package lab.prog.infinitecraftle.domain;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Date;
  * Game class that represents a game played by the user.
  * Contains the game's score, time, win status, elements, date and user
  */
-public class Game {
+public class Game implements Serializable {
     private int score;
     private int timeMillis;
     private boolean win;
@@ -54,6 +55,9 @@ public class Game {
      */
     public Element getTargetElement() {
         return targetElement;
+    }
+    public void setDate(Date date) {
+        DateToString(date);
     }
     /**
      * Getter for date of the game

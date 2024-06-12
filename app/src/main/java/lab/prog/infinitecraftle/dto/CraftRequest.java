@@ -25,6 +25,9 @@ public class CraftRequest {
             return null;
         }
     }
+    public String getGameDateString(){
+        return gameDate;
+    }
     /**
      * Getter for parent1
      * @return parent1

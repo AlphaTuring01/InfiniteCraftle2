@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -34,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         String userId = preferencesHandler.getUserId(this);
         String gameDate = preferencesHandler.getGameDate(this);
         if (userId != null && gameDate != null) {
-            moveToHomeActivity();
+            moveToHomeActivity(null);
             return;
         }
 
@@ -60,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                     preferencesHandler.saveUserData(this,
                             String.valueOf(loginResponse.getGame().getUser().getId()),
                             loginResponse.getGame().getDateString());
-                    moveToHomeActivity();
+                    moveToHomeActivity(null);
                 } else {
                     errorText.setText(loginResponse.getError());
                 }
@@ -75,8 +76,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void moveToHomeActivity() {
+    private void moveToHomeActivity(LoginResponse loginResponse) {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+        // intent.putExtra("GAME_DATA", loginResponse);
         startActivity(intent);
         finish();
     }

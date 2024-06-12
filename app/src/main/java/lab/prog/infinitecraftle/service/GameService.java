@@ -17,7 +17,7 @@ import okhttp3.Response;
 
 public class GameService {
 
-    private static final String BASE_URL = "http://172.15.1.60:8080/api/";
+    private static final String BASE_URL = "http://172.15.1.60:8000/api/";
     private final OkHttpClient client;
     private final Gson gson;
 
@@ -29,7 +29,7 @@ public class GameService {
     public void craftElement(CraftRequest craftRequest, ResponseCallback<CraftResponse> callback) {
         String urlString = BASE_URL + "craft";
         String requestBody = "{\"userId\":" + craftRequest.getUserId() + ",\"gameDate\":\"" +
-                craftRequest.getGameDate() + "\", \"parent1\":\"" + craftRequest.getParent1() +
+                craftRequest.getGameDateString() + "\", \"parent1\":\"" + craftRequest.getParent1() +
                 "\",\"parent2\":\"" + craftRequest.getParent2() + "\"}";
 
         Request request = new Request.Builder()

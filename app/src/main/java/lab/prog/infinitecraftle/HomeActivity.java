@@ -15,19 +15,28 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
+import lab.prog.infinitecraftle.dto.CraftRequest;
+import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
+import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
 public class HomeActivity extends AppCompatActivity {
-
+    private int newViewIndex = 0;
+    private int newElementViewId;
+    private CraftViewModel craftViewModel;
     private FrameLayout craftingArea;
     private LinearLayout elementsLayout;
     //atributos do jogo atual
     private Game game;
-
     /*public HomeActivity(Game game){
         this.game = game;
     }*/
@@ -36,24 +45,41 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        craftViewModel = new ViewModelProvider(this).get(CraftViewModel.class);
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
 
         craftingArea.setOnDragListener(dragListener);
 
         ArrayList <Element> elements = new ArrayList<>();
-        elements.add(new Element("💧","Water"));
         elements.add(new Element("🔥","Fire"));
         elements.add(new Element("💨","Wind"));
         elements.add(new Element("🌍","Earth"));
         game = new Game(elements);
         AddAllElements();
+
         Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
 
         ImageButton buttonLogout = findViewById(R.id.button_logout);
         buttonLogout.setOnClickListener(view -> logout());
+
+        craftViewModel.getCraftResponseLiveData().observe(this, craftResponse -> {
+            if(!craftResponse.getError().isEmpty()){
+                return;
+            }
+            Element element = craftResponse.getElement();
+            for(int i=0;i<craftingArea.getChildCount();i++){
+                View child = craftingArea.getChildAt(i);
+                if(child.getId() != newElementViewId) continue;
+                if(!(child instanceof TextView)) continue;
+                ((TextView)child).setText(element.getName().concat(' ' + element.getEmoji()));
+                break;
+            }
+        });
+        craftViewModel.getErrorLiveData().observe(this, error -> {
+        });
     }
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
@@ -88,6 +114,8 @@ public class HomeActivity extends AppCompatActivity {
         params.setMarginEnd(16);
         element.setLayoutParams(params);
         element.setOnTouchListener(touchListener);
+        element.setId(newViewIndex);
+        newViewIndex++;;
         elementsLayout.addView(element);
     }
 
@@ -130,24 +158,37 @@ public class HomeActivity extends AppCompatActivity {
                     // If the view is already in the crafting area, move it
                     view.setX(event.getX() - ((float) view.getWidth() / 2));
                     view.setY(event.getY() - ((float) view.getHeight() / 2));
-                    isCloseToOtherView(view);
+                    isCloseToOtherView((TextView) view);
                 } else {
                     // Clone the view being dragged
-                    TextView clonedView = new TextView(this);
-                    clonedView.setText(((TextView) view).getText());
-                    clonedView.setPadding(30, 30, 30, 30); // Increase padding for larger size
-                    clonedView.setTextSize(24); // Increase text size
-                    clonedView.setBackground(view.getBackground());
+                    TextView clonedTextView = new TextView(this);
+                    clonedTextView.setText(((TextView) view).getText());
+                    clonedTextView.setPadding(30, 30, 30, 30); // Increase padding for larger size
+                    clonedTextView.setTextSize(24); // Increase text size
+                    clonedTextView.setBackground(view.getBackground());
 
                     FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
                     layoutParams.leftMargin = (int) event.getX() - (view.getWidth() / 2);
                     layoutParams.topMargin = (int) event.getY() - (view.getHeight() / 2);
 
-                    clonedView.setOnTouchListener(touchListener);
-                    craftingArea.addView(clonedView, layoutParams);
-                    clonedView.setVisibility(View.VISIBLE);
-                    isCloseToOtherView((View)clonedView);
+                    clonedTextView.setOnTouchListener(touchListener);
+                    craftingArea.addView(clonedTextView, layoutParams);
+                    clonedTextView.setVisibility(View.VISIBLE);
+                    clonedTextView.setId(newViewIndex);
+                    newViewIndex++;
+                    TextView clonedViewCopy = new TextView(this);
+                    clonedViewCopy.setX(event.getX() - (float) view.getWidth() / 2);
+                    clonedViewCopy.setY(event.getY() - (float) view.getHeight() / 2);
+
+                    TextView thisViewText = (TextView) view;
+                    String text = thisViewText.getText().toString();
+                    clonedViewCopy.setText(text);
+                    clonedViewCopy.setId(clonedTextView.getId());
+
+                    if(isCloseToOtherView(clonedViewCopy)){
+                        craftingArea.removeView(clonedTextView);
+                    }
                 }
                 return true;
             default:
@@ -156,20 +197,21 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     };
 
-    private boolean isCloseToOtherView(View view) {
-        // Loop through all child views of the crafting area
+    private boolean isCloseToOtherView(TextView view) {
         for (int i = 0; i < craftingArea.getChildCount(); i++) {
             View child = craftingArea.getChildAt(i);
-            // Check if the child view is the same as the dragged view
-            if (child != view) {
-                // Calculate the bounds (rectangles) of the dragged view and the child view
-                Rect rectDragged = new Rect((int) view.getX(), (int) view.getY(), (int) (view.getX() + view.getWidth()), (int) (view.getY() + view.getHeight()));
-                Rect rectChild = new Rect((int) child.getX(), (int) child.getY(), (int) (child.getX() + child.getWidth()), (int) (child.getY() + child.getHeight()));
-                // Check if the rectangles overlap (collision detection)
-                if (rectDragged.intersect(rectChild)) {
-                    deleteAndCreateNewViews(view, child);
-                    return true; // Return true if the rectangles overlap
-                }
+            if(!(child instanceof TextView)) continue;
+            int a = child.getId();
+            int b = view.getId();
+            if (child == view) continue;
+            Rect rectDragged = new Rect((int) view.getX(), (int) view.getY(), (int) (view.getX() + child.getWidth()), (int) (view.getY() + child.getHeight()));
+            Rect rectChild = new Rect((int) child.getX(), (int) child.getY(), (int) (child.getX() + child.getWidth()), (int) (child.getY() + child.getHeight()));
+            if (Rect.intersects(rectDragged, rectChild)) {
+                deleteAndCreateNewViews(view, child);
+                String view1Text = ((TextView)view).getText().toString();
+                String view2Text = ((TextView)child).getText().toString();
+                craftNewElement(view1Text, view2Text);
+                return true; // Return true if the rectangles overlap
             }
         }
         return false; // Return false if no overlap is found
@@ -177,25 +219,42 @@ public class HomeActivity extends AppCompatActivity {
 
     private void deleteAndCreateNewViews(View view1, View view2) {
         // Remove as duas views do craftingArea
+        //craftingArea.removeView(view1);
         craftingArea.removeView(view1);
-        craftingArea.removeView(view2);
 
         // Crie uma nova view para substituir as duas views excluídas
-        TextView newView = new TextView(this);
-        newView.setText("Nova View");
+        /*TextView newView = new TextView(this);
+        newView.setText("");
         newView.setPadding(20, 20, 20, 20);
         newView.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
         newView.setTextSize(18);
+        newView.setX((view1.getX() + view2.getX())/2);
+        newView.setY((view1.getY() + view2.getY())/2);
         newView.setTextColor(ContextCompat.getColor(this, android.R.color.black));
         newView.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        newView.setOnTouchListener(touchListener);
 
-        // Adicione a nova view à craftingArea
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        craftingArea.addView(newView, params);
+        newView.setId(newViewIndex);
+        newViewIndex++;*/
+
+        newElementViewId = view2.getId();
+        view2.setX((view1.getX() + view2.getX())/2);
+        view2.setY((view1.getY() + view2.getY())/2);
+//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+//                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+//        craftingArea.addView(newView, params);
     }
 
-
+    void craftNewElement(String parent1, String parent2){
+        CraftRequest request = new CraftRequest(removeEmoji(parent1), removeEmoji(parent2));
+        SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
+        request.setGameDate(preferencesHandler.getGameDate(this));
+        request.setUserId(Integer.parseInt(preferencesHandler.getUserId(this)));
+        craftViewModel.craftElement(request);
+    }
+    public static String removeEmoji(String input) {
+        return input.trim().split("\\s+")[0];
+    }
     private void resetCraftingArea() {
         craftingArea.removeAllViews();
     }

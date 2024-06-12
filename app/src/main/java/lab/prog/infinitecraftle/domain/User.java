@@ -1,10 +1,12 @@
 package lab.prog.infinitecraftle.domain;
 
+import java.io.Serializable;
+
 /**
  * Class that represents a user.
  * Contains the user's username, password and id
  */
-public class User {
+public class User implements Serializable {
     private String username, password;
     private int id;
 

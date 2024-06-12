@@ -1,5 +1,6 @@
 package lab.prog.infinitecraftle.dto;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,7 +9,7 @@ import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
 
 
-public class LoginResponse {
+public class LoginResponse implements Serializable {
     private Element elementDay;
     private long initialTime;
     private String error;

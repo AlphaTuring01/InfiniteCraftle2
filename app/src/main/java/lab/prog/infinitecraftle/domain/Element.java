@@ -1,11 +1,13 @@
 package lab.prog.infinitecraftle.domain;
 
+import java.io.Serializable;
+
 /**
  * Element class that
  * represents an element.
  * Contains the element's name, depth, id, emoji, and parents
  */
-public class Element {
+public class Element implements Serializable {
     private String name;
     private int depth, id;
     private String emoji;

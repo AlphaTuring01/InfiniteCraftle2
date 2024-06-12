@@ -13,7 +13,7 @@ import okhttp3.Response;
 
 public class AuthService {
 
-    private static final String BASE_URL = "http://172.15.1.60:8080/api/";
+    private static final String BASE_URL = "http://172.15.1.60:8000/api/";
     private final OkHttpClient client;
     private final Gson gson;
 
