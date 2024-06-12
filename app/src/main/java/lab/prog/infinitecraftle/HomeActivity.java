@@ -2,12 +2,14 @@ package lab.prog.infinitecraftle;
 
 import android.content.ClipData;
 import android.graphics.Rect;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -49,6 +51,19 @@ public class HomeActivity extends AppCompatActivity {
         Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
+
+        ImageButton buttonLogout = findViewById(R.id.button_logout);
+        buttonLogout.setOnClickListener(view -> logout());
+    }
+    private void moveToLoginActivity() {
+        Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    private void logout() {
+        SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
+        preferencesHandler.clearUserData(this);
+        moveToLoginActivity();
     }
 
     protected void AddAllElements(){
@@ -113,8 +128,8 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (view.getParent() == craftingArea) {
                     // If the view is already in the crafting area, move it
-                    view.setX(event.getX() - (view.getWidth() / 2));
-                    view.setY(event.getY() - (view.getHeight() / 2));
+                    view.setX(event.getX() - ((float) view.getWidth() / 2));
+                    view.setY(event.getY() - ((float) view.getHeight() / 2));
                     isCloseToOtherView(view);
                 } else {
                     // Clone the view being dragged

@@ -28,7 +28,7 @@ public class User {
      * Setter for id of the user
      * @param id id of the user
      */
-    void setId(int id){
+    public void setId(int id){
         this.id = id;
     }
 
@@ -36,7 +36,7 @@ public class User {
      * Getter for id of the user
      * @return id of the user
      */
-    int getId(){
+    public int getId(){
         return id;
     }
 
@@ -44,7 +44,7 @@ public class User {
      * Getter for username of the user
      * @return username of the user
      */
-    String getUsername(){
+    public String getUsername(){
         return username;
     }
 
@@ -52,7 +52,7 @@ public class User {
      * Getter for password of the user
      * @return password of the user
      */
-    String getPassword(){
+    public String getPassword(){
         return password;
     }
 }
