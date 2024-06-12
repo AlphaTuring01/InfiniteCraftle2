@@ -24,15 +24,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize ViewModel
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-
-        // Find views
         EditText usernameEditText = findViewById(R.id.loginEditText);
         EditText passwordEditText = findViewById(R.id.passwordEditText);
         Button loginButton = findViewById(R.id.loginButton);
         TextView errorText = findViewById(R.id.errorText);
-        // Set OnClickListener for loginButton
+        TextView signupClickable = findViewById(R.id.signupClickable);
+
+        signupClickable.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+            startActivity(intent);
+        });
+
         loginButton.setOnClickListener(view -> {
             String username = usernameEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
@@ -44,17 +47,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Observe LiveData from LoginViewModel
         loginViewModel.getLoginResponseLiveData().observe(this, loginResponse -> {
-            // Handle login response
             if (loginResponse != null) {
                 if (loginResponse.getError().isEmpty()) {
-                    // Move to home activity if login is successful
                     moveToHomeActivity();
                 } else {
                     errorText.setText(loginResponse.getError());
-                    // Display error message if login fails
-                    //Toast.makeText(LoginActivity.this, loginResponse.getError(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -63,7 +61,6 @@ public class LoginActivity extends AppCompatActivity {
             // Handle error
             if (error != null) {
                 errorText.setText(error.toString());
-                //Toast.makeText(LoginActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -71,6 +68,6 @@ public class LoginActivity extends AppCompatActivity {
     private void moveToHomeActivity() {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         startActivity(intent);
-        finish(); // Finish current activity to prevent going back to LoginActivity
+        finish();
     }
 }
