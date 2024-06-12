@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 
+import lab.prog.infinitecraftle.dto.ChangeDateResponse;
 import lab.prog.infinitecraftle.dto.CraftRequest;
 import lab.prog.infinitecraftle.dto.CraftResponse;
 import lab.prog.infinitecraftle.dto.LoginResponse;
@@ -54,6 +55,30 @@ public class GameService {
             }
         });
     }
+    public void changeDate(int userId, String date, ResponseCallback<ChangeDateResponse> callback) {
+        String urlString = BASE_URL + "change-date?userId=" + userId + "&" + "date=" + date;
+        Request request = new Request.Builder()
+                .url(urlString)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onFailure(e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    ChangeDateResponse changeResponse = gson.fromJson(response.body().string(), ChangeDateResponse.class);
+                    callback.onResponse(changeResponse);
+                } else {
+                    callback.onFailure(new IOException("Unexpected code " + response));
+                }
+            }
+        });
+    }
+
 
     public interface ResponseCallback<T> {
         void onResponse(T response);
