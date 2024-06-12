@@ -19,7 +19,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,10 +53,13 @@ public class HomeActivity extends AppCompatActivity {
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
         TextView wordView = findViewById(R.id.wordView);
+        TextView dateView = findViewById(R.id.wordViewDate);
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
         wordView.setText(loginResponse.getElementDay().getName());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
+        dateView.setText(formatter.format(new Date()));
         game = loginResponse.getGame();
         AddAllElements();
 
