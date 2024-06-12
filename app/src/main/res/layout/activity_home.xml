@@ -97,9 +97,17 @@
     <FrameLayout
         android:id="@+id/crafting_area"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="420dp"
         android:layout_weight="1"
-        android:background="#EEEEEE" />
+        android:background="#EEEEEE">
+
+        <ImageView
+            android:id="@+id/bin"
+            android:layout_width="64dp"
+            android:layout_height="75dp"
+            android:layout_gravity="end"
+            app:srcCompat="@drawable/lixeira3" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/drag_elements"

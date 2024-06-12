@@ -1,5 +1,6 @@
 package lab.prog.infinitecraftle;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.graphics.Rect;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,10 +33,13 @@ import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
 public class HomeActivity extends AppCompatActivity {
-    private int newViewIndex = 0;
+    private int newViewIndex = 10;
     private int newElementViewId;
     private CraftViewModel craftViewModel;
     private FrameLayout craftingArea;
+
+    private ImageView bin;
+    private FrameLayout rootLayout;
     private LinearLayout elementsLayout;
     //atributos do jogo atual
     private Game game;
@@ -50,6 +55,11 @@ public class HomeActivity extends AppCompatActivity {
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
         TextView wordView = findViewById(R.id.wordView);
+        bin = findViewById(R.id.bin);
+        bin.setId(newViewIndex);
+        newViewIndex++;
+        //rootLayout = findViewById(R.id.root_layout);
+        //rootLayout.setOnDragListener(dragListener);
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
@@ -116,22 +126,30 @@ public class HomeActivity extends AppCompatActivity {
         element.setText(elementText);
         element.setPadding(20, 20, 20, 20);
         element.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
-        element.setTextSize(18);
+        element.setTextSize(18); // Tamanho do texto mantido como 18sp
         element.setTextColor(ContextCompat.getColor(this, android.R.color.black));
         element.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMarginStart(16);
-        params.setMarginEnd(16);
-        element.setLayoutParams(params);
+        // Medir a altura do texto após definir o texto
+        element.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, // Largura definida como WRAP_CONTENT
+                        LinearLayout.LayoutParams.WRAP_CONTENT  // Altura definida com base na altura do texto
+                );
+                params.setMarginStart(16);
+                params.setMarginEnd(16);
+                element.setLayoutParams(params);
+            }
+        });
+
         element.setOnTouchListener(touchListener);
         element.setId(newViewIndex);
-        newViewIndex++;;
+        newViewIndex++;
         elementsLayout.addView(element);
     }
+
 
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
         @Override
@@ -164,10 +182,14 @@ public class HomeActivity extends AppCompatActivity {
                 if (draggedView.getParent() == craftingArea) {
                     draggedView.setVisibility(View.VISIBLE); // Make the view visible again if it was in the crafting area
                 }
+                if (isInBin(draggedView)){
+                    craftingArea.removeView(draggedView);
+                    return true;
+                }
+
                 return true;
             case DragEvent.ACTION_DROP:
                 View view = (View) event.getLocalState();
-
                 if (view.getParent() == craftingArea) {
                     // If the view is already in the crafting area, move it
                     view.setX(event.getX() - ((float) view.getWidth() / 2));
@@ -195,11 +217,9 @@ public class HomeActivity extends AppCompatActivity {
                     clonedViewCopy.setX(event.getX() - (float) view.getWidth() / 2);
                     clonedViewCopy.setY(event.getY() - (float) view.getHeight() / 2);
 
-                    TextView thisViewText = (TextView) view;
-                    String text = thisViewText.getText().toString();
+                    String text = ((TextView) view).getText().toString();
                     clonedViewCopy.setText(text);
                     clonedViewCopy.setId(clonedTextView.getId());
-
                     if(isCloseToOtherView(clonedViewCopy)){
                         craftingArea.removeView(clonedTextView);
                     }
@@ -211,8 +231,18 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     };
 
+    private boolean isInBin(View mainView) {
+        Rect mainRect = new Rect();
+        mainView.getGlobalVisibleRect(mainRect);
+
+        Rect binRect = new Rect();
+        bin.getGlobalVisibleRect(binRect);
+
+        return mainRect.intersect(binRect);
+    }
+
     private boolean isCloseToOtherView(TextView view) {
-        for (int i = 0; i < craftingArea.getChildCount(); i++) {
+        for (int i = 1; i < craftingArea.getChildCount(); i++) {
             View child = craftingArea.getChildAt(i);
             if(!(child instanceof TextView)) continue;
             int a = child.getId();
@@ -221,7 +251,7 @@ public class HomeActivity extends AppCompatActivity {
             Rect rectDragged = new Rect((int) view.getX(), (int) view.getY(), (int) (view.getX() + child.getWidth()), (int) (view.getY() + child.getHeight()));
             Rect rectChild = new Rect((int) child.getX(), (int) child.getY(), (int) (child.getX() + child.getWidth()), (int) (child.getY() + child.getHeight()));
             if (Rect.intersects(rectDragged, rectChild)) {
-                deleteAndCreateNewViews(view, child);
+                craftView(view, child);
                 String view1Text = ((TextView)view).getText().toString();
                 String view2Text = ((TextView)child).getText().toString();
                 craftNewElement(view1Text, view2Text);
@@ -231,32 +261,12 @@ public class HomeActivity extends AppCompatActivity {
         return false; // Return false if no overlap is found
     }
 
-    private void deleteAndCreateNewViews(View view1, View view2) {
-        // Remove as duas views do craftingArea
+    private void craftView(View view1, View view2) {
         //craftingArea.removeView(view1);
         craftingArea.removeView(view1);
-
-        // Crie uma nova view para substituir as duas views excluídas
-        /*TextView newView = new TextView(this);
-        newView.setText("");
-        newView.setPadding(20, 20, 20, 20);
-        newView.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
-        newView.setTextSize(18);
-        newView.setX((view1.getX() + view2.getX())/2);
-        newView.setY((view1.getY() + view2.getY())/2);
-        newView.setTextColor(ContextCompat.getColor(this, android.R.color.black));
-        newView.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        newView.setOnTouchListener(touchListener);
-
-        newView.setId(newViewIndex);
-        newViewIndex++;*/
-
         newElementViewId = view2.getId();
         view2.setX((view1.getX() + view2.getX())/2);
         view2.setY((view1.getY() + view2.getY())/2);
-//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-//                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-//        craftingArea.addView(newView, params);
     }
 
     void craftNewElement(String parent1, String parent2){
@@ -270,6 +280,8 @@ public class HomeActivity extends AppCompatActivity {
         return input.trim().split("\\s+")[1];
     }
     private void resetCraftingArea() {
-        craftingArea.removeAllViews();
+        for(int i=1; i<craftingArea.getChildCount(); i++){
+            craftingArea.removeView(craftingArea.getChildAt(i));
+        }
     }
 }
