@@ -37,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
         String gameDate = preferencesHandler.getGameDate(this);
         if (user != null && gameDate != null) {
             handleLogin(user.getUsername(), user.getPassword());
-            return;
         }
 
         signupClickable.setOnClickListener(view -> {

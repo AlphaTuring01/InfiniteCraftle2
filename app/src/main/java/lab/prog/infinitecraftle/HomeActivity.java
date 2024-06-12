@@ -49,9 +49,11 @@ public class HomeActivity extends AppCompatActivity {
         craftViewModel = new ViewModelProvider(this).get(CraftViewModel.class);
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
+        TextView wordView = findViewById(R.id.wordView);
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
+        wordView.setText(loginResponse.getElementDay().getName());
         game = loginResponse.getGame();
         AddAllElements();
 
