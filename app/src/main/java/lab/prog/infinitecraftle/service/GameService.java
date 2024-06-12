@@ -26,9 +26,11 @@ public class GameService {
         gson = new Gson();
     }
 
-    public void craftElement(int userId, String gameDate, String parent1, String parent2, ResponseCallback<CraftResponse> callback) {
+    public void craftElement(CraftRequest craftRequest, ResponseCallback<CraftResponse> callback) {
         String urlString = BASE_URL + "craft";
-        String requestBody = "{\"userId\":" + userId + ",\"gameDate\":\"" + gameDate + "\", \"parent1\":\"" + parent1 + "\",\"parent2\":\"" + parent2 + "\"}";
+        String requestBody = "{\"userId\":" + craftRequest.getUserId() + ",\"gameDate\":\"" +
+                craftRequest.getGameDate() + "\", \"parent1\":\"" + craftRequest.getParent1() +
+                "\",\"parent2\":\"" + craftRequest.getParent2() + "\"}";
 
         Request request = new Request.Builder()
                 .url(urlString)

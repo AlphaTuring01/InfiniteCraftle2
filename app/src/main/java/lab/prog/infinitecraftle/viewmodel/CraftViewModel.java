@@ -2,6 +2,7 @@ package lab.prog.infinitecraftle.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
+import lab.prog.infinitecraftle.dto.CraftRequest;
 import lab.prog.infinitecraftle.dto.CraftResponse;
 import lab.prog.infinitecraftle.service.GameService;
 
@@ -13,8 +14,8 @@ public class CraftViewModel extends ViewModel {
         gameService = new GameService();
     }
 
-    public void craftElement(int userId, String gameDate, String parent1, String parent2, CraftResponseCallback<CraftResponse> callback) {
-        gameService.craftElement(userId, gameDate, parent1, parent2, new GameService.ResponseCallback<CraftResponse>() {
+    public void craftElement(CraftRequest craftRequest, CraftResponseCallback<CraftResponse> callback) {
+        gameService.craftElement(craftRequest, new GameService.ResponseCallback<CraftResponse>() {
             @Override
             public void onResponse(CraftResponse response) {
                 callback.onResponse(response);
