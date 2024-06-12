@@ -23,7 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         EditText usernameEditText = findViewById(R.id.loginEditText);
         EditText passwordEditText = findViewById(R.id.passwordEditText);
@@ -50,6 +50,9 @@ public class LoginActivity extends AppCompatActivity {
         loginViewModel.getLoginResponseLiveData().observe(this, loginResponse -> {
             if (loginResponse != null) {
                 if (loginResponse.getError().isEmpty()) {
+                    preferencesHandler.saveUserData(this,
+                            String.valueOf(loginResponse.getGame().getUser().getId()),
+                            loginResponse.getGame().getDateString());
                     moveToHomeActivity();
                 } else {
                     errorText.setText(loginResponse.getError());

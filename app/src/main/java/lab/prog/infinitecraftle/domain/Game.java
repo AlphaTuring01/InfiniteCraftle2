@@ -58,6 +58,9 @@ public class Game {
     public Date getDate() {
         return StringToDate(date);
     }
+    public String getDateString() {
+        return date;
+    }
 
     /**
      * Getter for user that played the game

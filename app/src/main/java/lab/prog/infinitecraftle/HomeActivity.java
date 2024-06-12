@@ -96,8 +96,8 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (view.getParent() == craftingArea) {
                     // If the view is already in the crafting area, move it
-                    view.setX(event.getX() - (view.getWidth() / 2));
-                    view.setY(event.getY() - (view.getHeight() / 2));
+                    view.setX(event.getX() - ((float) view.getWidth() / 2));
+                    view.setY(event.getY() - ((float) view.getHeight() / 2));
                 } else {
                     // Clone the view being dragged
                     TextView clonedView = new TextView(this);
