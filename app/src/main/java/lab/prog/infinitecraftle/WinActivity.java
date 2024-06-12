@@ -10,12 +10,18 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import nl.dionsegijn.konfetti.KonfettiView;
-import nl.dionsegijn.konfetti.models.Shape;
-import nl.dionsegijn.konfetti.models.Size;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import nl.dionsegijn.konfetti.core.Party;
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
+import nl.dionsegijn.konfetti.core.models.Shape;
+import nl.dionsegijn.konfetti.core.models.Size;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 public class WinActivity extends AppCompatActivity {
 
@@ -24,11 +30,9 @@ public class WinActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_win);
 
-        TextView tvVictoryMessage = findViewById(R.id.tvVictoryMessage);
         TextView tvScore = findViewById(R.id.tvScore);
         TextView tvTime = findViewById(R.id.tvTime);
         Button buttonContinuePlaying = findViewById(R.id.buttonContinuePlaying);
-        KonfettiView konfettiView = findViewById(R.id.konfettiView);
         RecyclerView rvScores = findViewById(R.id.rvScores);
 
         // Get the score and time from the intent
@@ -47,17 +51,25 @@ public class WinActivity extends AppCompatActivity {
             finish();
         });
 
-        // Start the confetti animation
-        konfettiView.build()
-                .addColors(ContextCompat.getColor(this, R.color.red), ContextCompat.getColor(this, R.color.blue), ContextCompat.getColor(this, R.color.yellow))
-                .setDirection(0.0, 359.0)
-                .setSpeed(1f, 5f)
-                .setFadeOutEnabled(true)
-                .setTimeToLive(2000L)
-                .addShapes(Shape.Square.INSTANCE, Shape.Circle.INSTANCE)
-                .addSizes(new Size(12, 5f))
-                .setPosition(-50f, konfettiView.getWidth() + 50f, -50f, -50f)
-                .streamFor(300, 5000L);
+        int red = ContextCompat.getColor(this, R.drawable.colors.red);
+        int blue = ContextCompat.getColor(this, R.drawable.colors.blue);
+        int yellow = ContextCompat.getColor(this, R.drawable.colors.yellow);
+
+        KonfettiView konfettiView = findViewById(R.id.konfettiView);
+        EmitterConfig emitterConfig = new Emitter(5L, TimeUnit.SECONDS).perSecond(50);
+        Party party =
+                new PartyFactory(emitterConfig)
+                        .angle(270)
+                        .spread(90)
+                        .setSpeedBetween(1f, 5f)
+                        .timeToLive(2000L)
+                        .shapes(Arrays.asList(Shape.Square.INSTANCE, Shape.Circle.INSTANCE))
+                        .sizes(new Size(12, 5f, 0.2f))
+                        .position(0.0, 0.0, 1.0, 0.0)
+                        .colors(Arrays.asList(red, blue, yellow))
+
+                        .build();
+        konfettiView.start(party);
 
         // Prepare the data for the scores
         List<Score> scoreList = new ArrayList<>();
