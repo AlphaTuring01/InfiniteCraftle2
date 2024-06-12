@@ -1,14 +1,15 @@
 package lab.prog.infinitecraftle;
 
 import android.content.ClipData;
-import android.graphics.Rect;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,30 +18,30 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.dto.CraftRequest;
 import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
-import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
 public class HomeActivity extends AppCompatActivity {
+    private static final int WIN_ACTIVITY_REQUEST_CODE = 1;
+
     private int newViewIndex = 0;
     private int newElementViewId;
     private CraftViewModel craftViewModel;
     private FrameLayout craftingArea;
     private LinearLayout elementsLayout;
-    //atributos do jogo atual
+    private HorizontalScrollView elementsScrollView;
+    private float initialX, initialY;
+    private boolean isHorizontalDrag = false;
+    private boolean isVerticalDrag = false;
+
+    // Attributes for the current game
     private Game game;
-    /*public HomeActivity(Game game){
-        this.game = game;
-    }*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         craftViewModel = new ViewModelProvider(this).get(CraftViewModel.class);
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
+        elementsScrollView = findViewById(R.id.elements_scroll_view);
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
@@ -81,11 +83,13 @@ public class HomeActivity extends AppCompatActivity {
         craftViewModel.getErrorLiveData().observe(this, error -> {
         });
     }
+
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
+
     private void logout() {
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         preferencesHandler.clearUserData(this);
@@ -97,6 +101,7 @@ public class HomeActivity extends AppCompatActivity {
             addElement(e.getEmoji(), e.getName());
         }
     }
+
     private void addElement(String emoji, String name) {
         String elementText = emoji + " " + name;
 
@@ -127,23 +132,47 @@ public class HomeActivity extends AppCompatActivity {
         element.setLayoutParams(params);
         element.setOnTouchListener(touchListener);
         element.setId(newViewIndex);
-        newViewIndex++;;
+        newViewIndex++;
         elementsLayout.addView(element);
     }
 
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                v.startDragAndDrop(data, shadowBuilder, v, 0);
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = event.getX();
+                    initialY = event.getY();
+                    isHorizontalDrag = false;
+                    isVerticalDrag = false;
+                    return true;
 
-                // Make the view invisible if it is being dragged from the crafting area
-                if (v.getParent() == craftingArea) {
-                    v.setVisibility(View.INVISIBLE);
-                }
-                return true;
+                case MotionEvent.ACTION_MOVE:
+                    float deltaX = event.getX() - initialX;
+                    float deltaY = event.getY() - initialY;
+
+                    if (!isHorizontalDrag && !isVerticalDrag) {
+                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                            isHorizontalDrag = true;
+                        } else {
+                            isVerticalDrag = true;
+                        }
+                    }
+
+                    if (isHorizontalDrag) {
+                        elementsScrollView.requestDisallowInterceptTouchEvent(false);
+                        return false;
+                    } else if (isVerticalDrag) {
+                        elementsScrollView.requestDisallowInterceptTouchEvent(true);
+                        ClipData data = ClipData.newPlainText("", "");
+                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                        v.startDragAndDrop(data, shadowBuilder, v, 0);
+                        return true;
+                    }
+
+                case MotionEvent.ACTION_UP:
+                    elementsScrollView.requestDisallowInterceptTouchEvent(false);
+                    return true;
             }
             return false;
         }
@@ -152,9 +181,7 @@ public class HomeActivity extends AppCompatActivity {
     private View.OnDragListener dragListener = (v, event) -> {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED:
-                return true;
             case DragEvent.ACTION_DRAG_ENTERED:
-                return true;
             case DragEvent.ACTION_DRAG_EXITED:
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
@@ -230,31 +257,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void deleteAndCreateNewViews(View view1, View view2) {
-        // Remove as duas views do craftingArea
-        //craftingArea.removeView(view1);
         craftingArea.removeView(view1);
-
-        // Crie uma nova view para substituir as duas views excluídas
-        /*TextView newView = new TextView(this);
-        newView.setText("");
-        newView.setPadding(20, 20, 20, 20);
-        newView.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
-        newView.setTextSize(18);
-        newView.setX((view1.getX() + view2.getX())/2);
-        newView.setY((view1.getY() + view2.getY())/2);
-        newView.setTextColor(ContextCompat.getColor(this, android.R.color.black));
-        newView.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        newView.setOnTouchListener(touchListener);
-
-        newView.setId(newViewIndex);
-        newViewIndex++;*/
 
         newElementViewId = view2.getId();
         view2.setX((view1.getX() + view2.getX())/2);
         view2.setY((view1.getY() + view2.getY())/2);
-//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-//                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-//        craftingArea.addView(newView, params);
     }
 
     void craftNewElement(String parent1, String parent2){
@@ -264,10 +271,41 @@ public class HomeActivity extends AppCompatActivity {
         request.setUserId(preferencesHandler.getUser(this).getId());
         craftViewModel.craftElement(request);
     }
+
     public static String removeEmoji(String input) {
         return input.trim().split("\\s+")[1];
     }
+
     private void resetCraftingArea() {
         craftingArea.removeAllViews();
+    }
+
+    // Add this method to start the WinActivity
+    private void startWinActivity(int score, String time) {
+        Intent intent = new Intent(HomeActivity.this, WinActivity.class);
+        intent.putExtra("SCORE", score);
+        intent.putExtra("TIME", time);
+        startActivityForResult(intent, WIN_ACTIVITY_REQUEST_CODE);
+    }
+
+    // Handle the result from WinActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == WIN_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Handle returning to the game state
+        }
+    }
+
+    // Call this method when the user wins
+    private void checkForWin() {
+        // Your logic to check for win condition
+        boolean hasWon = true; // Replace this with your actual condition
+
+        if (hasWon) {
+            int score = 100; // Replace this with actual score calculation
+            String time = "00:10:00"; // Replace this with actual time calculation
+            startWinActivity(score, time);
+        }
     }
 }
