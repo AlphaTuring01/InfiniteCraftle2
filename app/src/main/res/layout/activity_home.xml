@@ -7,6 +7,7 @@
     android:orientation="vertical"
     tools:context=".HomeActivity"
     android:background="#FFFFFF">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,22 +31,18 @@
             android:layout_marginEnd="0dp"
             android:layout_marginTop="0dp"
             android:scaleType="fitCenter"
-            android:contentDescription="Logout"
-            />
+            android:contentDescription="Logout"/>
     </LinearLayout>
 
-
-
     <!-- Main crafting area -->
-
-    <!-- Drag elements to craft text -->
     <FrameLayout
         android:id="@+id/crafting_area"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#EEEEEE" />
+        android:background="#EEEEEE"/>
 
+    <!-- Drag elements to craft text -->
     <TextView
         android:id="@+id/drag_elements"
         android:layout_width="wrap_content"
@@ -56,6 +53,7 @@
 
     <!-- Horizontal scrollable container for elements -->
     <HorizontalScrollView
+        android:id="@+id/elements_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

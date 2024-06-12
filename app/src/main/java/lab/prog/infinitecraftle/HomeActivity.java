@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -25,12 +26,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private FrameLayout craftingArea;
     private LinearLayout elementsLayout;
-    //atributos do jogo atual
     private Game game;
 
-    /*public HomeActivity(Game game){
-        this.game = game;
-    }*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +38,14 @@ public class HomeActivity extends AppCompatActivity {
 
         craftingArea.setOnDragListener(dragListener);
 
-        ArrayList <Element> elements = new ArrayList<>();
-        elements.add(new Element("💧","Water"));
-        elements.add(new Element("🔥","Fire"));
-        elements.add(new Element("💨","Wind"));
-        elements.add(new Element("🌍","Earth"));
+        ArrayList<Element> elements = new ArrayList<>();
+        elements.add(new Element("💧", "Water"));
+        elements.add(new Element("🔥", "Fire"));
+        elements.add(new Element("💨", "Wind"));
+        elements.add(new Element("🌍", "Earth"));
         game = new Game(elements);
         AddAllElements();
+
         Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
@@ -55,22 +53,25 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton buttonLogout = findViewById(R.id.button_logout);
         buttonLogout.setOnClickListener(view -> logout());
     }
+
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
+
     private void logout() {
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         preferencesHandler.clearUserData(this);
         moveToLoginActivity();
     }
 
-    protected void AddAllElements(){
-        for(Element e : game.getElements()){
+    protected void AddAllElements() {
+        for (Element e : game.getElements()) {
             addElement(e.getEmoji(), e.getName());
         }
     }
+
     private void addElement(String emoji, String name) {
         TextView element = new TextView(this);
         element.setText(emoji + " " + name);
@@ -114,13 +115,22 @@ public class HomeActivity extends AppCompatActivity {
             case DragEvent.ACTION_DRAG_STARTED:
                 return true;
             case DragEvent.ACTION_DRAG_ENTERED:
+                if (v instanceof TextView && v.getParent() == craftingArea) {
+                    v.setBackground(ContextCompat.getDrawable(this, R.drawable.blue_gradient));
+                }
                 return true;
             case DragEvent.ACTION_DRAG_EXITED:
+                if (v instanceof TextView && v.getParent() == craftingArea) {
+                    v.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
+                }
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
                 View draggedView = (View) event.getLocalState();
                 if (draggedView.getParent() == craftingArea) {
                     draggedView.setVisibility(View.VISIBLE); // Make the view visible again if it was in the crafting area
+                } else {
+                    // Remove the view if it is dropped outside the crafting area
+                    ((ViewGroup) draggedView.getParent()).removeView(draggedView);
                 }
                 return true;
             case DragEvent.ACTION_DROP:
@@ -146,8 +156,11 @@ public class HomeActivity extends AppCompatActivity {
 
                     clonedView.setOnTouchListener(touchListener);
                     craftingArea.addView(clonedView, layoutParams);
+                    TextView clonedTextView = new TextView(this);
+                    clonedTextView.setX(event.getX() - (float)(view.getWidth()/2));
+                    clonedTextView.setY(event.getY() - (float)(view.getHeight()/2));
                     clonedView.setVisibility(View.VISIBLE);
-                    isCloseToOtherView((View)clonedView);
+                    isCloseToOtherView(clonedTextView);
                 }
                 return true;
             default:
@@ -176,11 +189,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void deleteAndCreateNewViews(View view1, View view2) {
-        // Remove as duas views do craftingArea
+        // Remove the two views from the crafting area
         craftingArea.removeView(view1);
         craftingArea.removeView(view2);
 
-        // Crie uma nova view para substituir as duas views excluídas
+        // Create a new view to replace the two removed views
         TextView newView = new TextView(this);
         newView.setText("Nova View");
         newView.setPadding(20, 20, 20, 20);
@@ -189,12 +202,11 @@ public class HomeActivity extends AppCompatActivity {
         newView.setTextColor(ContextCompat.getColor(this, android.R.color.black));
         newView.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
-        // Adicione a nova view à craftingArea
+        // Add the new view to the crafting area
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         craftingArea.addView(newView, params);
     }
-
 
     private void resetCraftingArea() {
         craftingArea.removeAllViews();
