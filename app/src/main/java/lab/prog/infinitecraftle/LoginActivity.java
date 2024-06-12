@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import lab.prog.infinitecraftle.domain.User;
 import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
@@ -32,10 +33,10 @@ public class LoginActivity extends AppCompatActivity {
         TextView errorText = findViewById(R.id.errorText);
         TextView signupClickable = findViewById(R.id.signupClickable);
 
-        String userId = preferencesHandler.getUserId(this);
+        User user = preferencesHandler.getUser(this);
         String gameDate = preferencesHandler.getGameDate(this);
-        if (userId != null && gameDate != null) {
-            moveToHomeActivity(null);
+        if (user != null && gameDate != null) {
+            handleLogin(user.getUsername(), user.getPassword());
             return;
         }
 
@@ -47,21 +48,16 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(view -> {
             String username = usernameEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
-            if (!username.isEmpty() && !password.isEmpty()) {
-                // Call login method of LoginViewModel
-                loginViewModel.login(username, password);
-            } else {
-                Toast.makeText(LoginActivity.this, "Please enter username and password", Toast.LENGTH_SHORT).show();
-            }
+            handleLogin(username, password);
         });
 
         loginViewModel.getLoginResponseLiveData().observe(this, loginResponse -> {
             if (loginResponse != null) {
                 if (loginResponse.getError().isEmpty()) {
                     preferencesHandler.saveUserData(this,
-                            String.valueOf(loginResponse.getGame().getUser().getId()),
+                            loginResponse.getGame().getUser(),
                             loginResponse.getGame().getDateString());
-                    moveToHomeActivity(null);
+                    moveToHomeActivity(loginResponse);
                 } else {
                     errorText.setText(loginResponse.getError());
                 }
@@ -76,9 +72,17 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void handleLogin(String username, String password) {
+        if (!username.isEmpty() && !password.isEmpty()) {
+            loginViewModel.login(username, password);
+        } else {
+            Toast.makeText(LoginActivity.this, "Please enter username and password", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void moveToHomeActivity(LoginResponse loginResponse) {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-        // intent.putExtra("GAME_DATA", loginResponse);
+        intent.putExtra("GAME_DATA", loginResponse);
         startActivity(intent);
         finish();
     }

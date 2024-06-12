@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.dto.CraftRequest;
+import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
@@ -50,12 +51,8 @@ public class HomeActivity extends AppCompatActivity {
         elementsLayout = findViewById(R.id.elements_layout);
 
         craftingArea.setOnDragListener(dragListener);
-
-        ArrayList <Element> elements = new ArrayList<>();
-        elements.add(new Element("🔥","Fire"));
-        elements.add(new Element("💨","Wind"));
-        elements.add(new Element("🌍","Earth"));
-        game = new Game(elements);
+        LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
+        game = loginResponse.getGame();
         AddAllElements();
 
         Button buttonReset = findViewById(R.id.button_reset);
@@ -74,7 +71,10 @@ public class HomeActivity extends AppCompatActivity {
                 View child = craftingArea.getChildAt(i);
                 if(child.getId() != newElementViewId) continue;
                 if(!(child instanceof TextView)) continue;
-                ((TextView)child).setText(element.getName().concat(' ' + element.getEmoji()));
+                String name = element.getName();
+                String emoji = element.getEmoji();
+                ((TextView)child).setText(emoji.concat(' ' + name));
+                addElement(emoji, name);
                 break;
             }
         });
@@ -98,8 +98,20 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
     private void addElement(String emoji, String name) {
+        String elementText = emoji + " " + name;
+
+        for (int i = 0; i < elementsLayout.getChildCount(); i++) {
+            View child = elementsLayout.getChildAt(i);
+            if (child instanceof TextView) {
+                TextView existingElement = (TextView) child;
+                if (existingElement.getText().toString().equals(elementText)) {
+                    return; // Element is already present, so do not add it again
+                }
+            }
+        }
+
         TextView element = new TextView(this);
-        element.setText(emoji + " " + name);
+        element.setText(elementText);
         element.setPadding(20, 20, 20, 20);
         element.setBackground(ContextCompat.getDrawable(this, R.drawable.element_background));
         element.setTextSize(18);
@@ -249,11 +261,11 @@ public class HomeActivity extends AppCompatActivity {
         CraftRequest request = new CraftRequest(removeEmoji(parent1), removeEmoji(parent2));
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         request.setGameDate(preferencesHandler.getGameDate(this));
-        request.setUserId(Integer.parseInt(preferencesHandler.getUserId(this)));
+        request.setUserId(preferencesHandler.getUser(this).getId());
         craftViewModel.craftElement(request);
     }
     public static String removeEmoji(String input) {
-        return input.trim().split("\\s+")[0];
+        return input.trim().split("\\s+")[1];
     }
     private void resetCraftingArea() {
         craftingArea.removeAllViews();
