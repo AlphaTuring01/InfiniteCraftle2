@@ -1,12 +1,14 @@
 package lab.prog.infinitecraftle;
 
 import android.content.ClipData;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -37,8 +39,21 @@ public class HomeActivity extends AppCompatActivity {
         Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
         buttonReset.setOnClickListener(v -> resetCraftingArea());
+
+        ImageButton buttonLogout = findViewById(R.id.button_logout);
+        buttonLogout.setOnClickListener(view -> logout());
+    }
+    private void logout() {
+        SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
+        preferencesHandler.clearUserData(this);
+        moveToLoginActivity();
     }
 
+    private void moveToLoginActivity() {
+        Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
     private void addElement(String text, int backgroundResId) {
         TextView element = new TextView(this);
         element.setText(text);

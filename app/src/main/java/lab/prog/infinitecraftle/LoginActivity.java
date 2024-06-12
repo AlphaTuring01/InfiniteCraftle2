@@ -31,6 +31,13 @@ public class LoginActivity extends AppCompatActivity {
         TextView errorText = findViewById(R.id.errorText);
         TextView signupClickable = findViewById(R.id.signupClickable);
 
+        String userId = preferencesHandler.getUserId(this);
+        String gameDate = preferencesHandler.getGameDate(this);
+        if (userId != null && gameDate != null) {
+            moveToHomeActivity();
+            return;
+        }
+
         signupClickable.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
