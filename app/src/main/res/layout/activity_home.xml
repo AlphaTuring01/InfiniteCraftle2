@@ -78,14 +78,16 @@
 
         <TextView
             android:id="@+id/wordViewDate"
-            android:text="12/06/24"
+            android:text="Data"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="12dp"
             android:textColor="@android:color/black"
-            android:gravity="center_vertical|end"/>
+            android:gravity="center_vertical|end"
+            android:clickable="true"
+            android:focusable="true"/>
     </LinearLayout>
 
 
