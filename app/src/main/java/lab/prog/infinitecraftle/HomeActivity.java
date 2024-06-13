@@ -71,8 +71,6 @@ public class HomeActivity extends AppCompatActivity {
         elementsLayout = findViewById(R.id.elements_layout);
         TextView wordView = findViewById(R.id.wordView);
         bin = findViewById(R.id.bin);
-        bin.setId(newViewIndex);
-        newViewIndex++;
         TextView dateView = findViewById(R.id.wordViewDate);
         elementsScrollView = findViewById(R.id.elements_scroll_view);
 
@@ -83,6 +81,8 @@ public class HomeActivity extends AppCompatActivity {
             wordView.setText(loginResponse.getGame().getTargetElement().getName());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
             dateView.setText(formatter.format(game.getDate()));
+            if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
+            else ((TextView) findViewById(R.id.dayWon)).setText("");
         }
         dateList = loginResponse.getListDates();
         AddAllElements();
@@ -123,6 +123,8 @@ public class HomeActivity extends AppCompatActivity {
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
                 dateView.setText(formatter.format(game.getDate()));
                 AddAllElements();
+                if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
+                else ((TextView) findViewById(R.id.dayWon)).setText("");
             }
         });
         dateChanger.getErrorLiveData().observe(this, error -> {
@@ -374,7 +376,6 @@ public class HomeActivity extends AppCompatActivity {
         return false; // Return false if no overlap is found
     }
     private void craftView(View view1, View view2) {
-        //craftingArea.removeView(view1);
         craftingArea.removeView(view1);
         newElementViewId = view2.getId();
         view2.setX((view1.getX() + view2.getX())/2);
@@ -396,15 +397,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private void resetCraftingArea() {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
-            craftingArea.removeViewAt(i);
+            if(craftingArea.getChildAt(i).getId() != R.id.bin) craftingArea.removeViewAt(i);
         }
     }
 
     private void showDateDropdown(TextView dateView) {
         SharedPreferencesHandler handler = new SharedPreferencesHandler();
         User user = handler.getUser(this);
-        SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat targetFormat = new SimpleDateFormat("dd/MM/yy");
         PopupMenu popupMenu = new PopupMenu(this, dateView);
         for (String date : dateList) popupMenu.getMenu().add(date);
 
