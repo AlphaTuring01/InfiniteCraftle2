@@ -97,7 +97,6 @@ public class HomeActivity extends AppCompatActivity {
 
         ImageButton buttonLogout = findViewById(R.id.button_logout);
         buttonLogout.setOnClickListener(view -> logout());
-
         craftViewModel.getCraftResponseLiveData().observe(this, craftResponse -> {
             if(!craftResponse.getError().isEmpty()){
                 return;
@@ -367,6 +366,9 @@ public class HomeActivity extends AppCompatActivity {
             SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
             preferencesHandler.setGameDate(this, item.getTitle().toString());
             resetCraftingArea();
+            elementList.clear();
+            elementList = game.getElements();
+            elementAdapter.notifyDataSetChanged();
             return true;
         });
 
