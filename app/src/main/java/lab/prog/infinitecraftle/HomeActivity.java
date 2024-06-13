@@ -16,9 +16,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+
+import org.w3c.dom.Text;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,9 +33,11 @@ import java.util.concurrent.TimeUnit;
 
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
+import lab.prog.infinitecraftle.domain.User;
 import lab.prog.infinitecraftle.dto.CraftRequest;
 import lab.prog.infinitecraftle.dto.CraftResponse;
 import lab.prog.infinitecraftle.dto.LoginResponse;
+import lab.prog.infinitecraftle.viewmodel.ChangeDateViewModel;
 import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
 
 public class HomeActivity extends AppCompatActivity {
@@ -36,6 +45,8 @@ public class HomeActivity extends AppCompatActivity {
     private static final int WIN_ACTIVITY_REQUEST_CODE = 1;
     private int newElementViewId;
     private CraftViewModel craftViewModel;
+    private ChangeDateViewModel dateChanger;
+
     private FrameLayout craftingArea;
 
     private ImageView bin;
@@ -55,6 +66,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         craftViewModel = new ViewModelProvider(this).get(CraftViewModel.class);
+        dateChanger = new ViewModelProvider(this).get(ChangeDateViewModel.class);
         craftingArea = findViewById(R.id.crafting_area);
         elementsLayout = findViewById(R.id.elements_layout);
         TextView wordView = findViewById(R.id.wordView);
@@ -67,7 +79,7 @@ public class HomeActivity extends AppCompatActivity {
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
         game = loginResponse.getGame();
-        if(loginResponse.getGame() != null){
+        if(game != null){
             wordView.setText(loginResponse.getGame().getTargetElement().getName());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
             dateView.setText(formatter.format(game.getDate()));
@@ -103,6 +115,24 @@ public class HomeActivity extends AppCompatActivity {
         });
         craftViewModel.getErrorLiveData().observe(this, error -> {
         });
+
+        dateChanger.getChangeDateResponseLiveData().observe(this, changeDataResponse -> {
+            game = changeDataResponse.getGame();
+            if(game != null){
+                wordView.setText(game.getTargetElement().getName());
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
+                dateView.setText(formatter.format(game.getDate()));
+                AddAllElements();
+            }
+        });
+        dateChanger.getErrorLiveData().observe(this, error -> {
+        });
+        dateView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateDropdown(dateView);
+            }
+        });
     }
     private void moveToWinActivity(CraftResponse response) {
         Intent intent = new Intent(HomeActivity.this, WinActivity.class);
@@ -131,13 +161,13 @@ public class HomeActivity extends AppCompatActivity {
         moveToLoginActivity();
     }
     protected void AddAllElements(){
+        elementsLayout.removeAllViews(); // Clear all existing elements
         for(Element e : game.getElements()){
             addElement(e.getEmoji(), e.getName());
         }
     }
     private void addElement(String emoji, String name) {
         String elementText = emoji + " " + name;
-
         // Verifica se o elemento já está presente
         for (int i = 0; i < elementsLayout.getChildCount(); i++) {
             View child = elementsLayout.getChildAt(i);
@@ -367,5 +397,21 @@ public class HomeActivity extends AppCompatActivity {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             craftingArea.removeViewAt(i);
         }
+    }
+
+    private void showDateDropdown(TextView dateView) {
+        SharedPreferencesHandler handler = new SharedPreferencesHandler();
+        User user = handler.getUser(this);
+        SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat targetFormat = new SimpleDateFormat("dd/MM/yy");
+        PopupMenu popupMenu = new PopupMenu(this, dateView);
+        for (String date : dateList) popupMenu.getMenu().add(date);
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            dateChanger.changeDate(user.getId(), item.getTitle().toString());
+            return true;
+        });
+
+        popupMenu.show();
     }
 }
