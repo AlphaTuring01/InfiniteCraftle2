@@ -127,7 +127,9 @@ public class HomeActivity extends AppCompatActivity {
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
                 dateView.setText(formatter.format(game.getDate()));
                 elementList = game.getElements();
+                elementAdapter = new ElementAdapter(elementList, touchListener);
                 elementAdapter.notifyDataSetChanged();
+                elementsRecyclerView.setAdapter(elementAdapter);
                 if(game.isWin()) ( findViewById(R.id.dayWon)).setVisibility(View.VISIBLE);
                 else ( findViewById(R.id.dayWon)).setVisibility(View.INVISIBLE);
             }
