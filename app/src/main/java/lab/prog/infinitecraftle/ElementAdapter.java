@@ -26,7 +26,6 @@ public class ElementAdapter extends RecyclerView.Adapter<ElementAdapter.ElementV
         this.touchListener = touchListener;
     }
 
-
     @Override
     public ElementViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_element, parent, false);
