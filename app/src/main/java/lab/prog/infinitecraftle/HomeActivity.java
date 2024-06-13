@@ -11,18 +11,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -80,8 +76,8 @@ public class HomeActivity extends AppCompatActivity {
             wordView.setText(loginResponse.getGame().getTargetElement().getName());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
             dateView.setText(formatter.format(game.getDate()));
-            if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
-            else ((TextView) findViewById(R.id.dayWon)).setText("");
+            if(game.isWin()) ((ImageView) findViewById(R.id.dayWon)).setVisibility(View.VISIBLE);
+            else ((ImageView) findViewById(R.id.dayWon)).setVisibility(View.INVISIBLE);;
         }
         dateList = loginResponse.getListDates();
         elementList = game.getElements();
@@ -127,8 +123,8 @@ public class HomeActivity extends AppCompatActivity {
                 dateView.setText(formatter.format(game.getDate()));
                 elementList = game.getElements();
                 elementAdapter.notifyDataSetChanged();
-                if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
-                else ((TextView) findViewById(R.id.dayWon)).setText("");
+                if(game.isWin()) ((ImageView) findViewById(R.id.dayWon)).setVisibility(View.VISIBLE);
+                else ((ImageView) findViewById(R.id.dayWon)).setVisibility(View.INVISIBLE);
             }
         });
         dateChanger.getErrorLiveData().observe(this, error -> {
@@ -232,9 +228,7 @@ public class HomeActivity extends AppCompatActivity {
     private View.OnDragListener dragListener = (v, event) -> {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED:
-                return true;
             case DragEvent.ACTION_DRAG_ENTERED:
-                return true;
             case DragEvent.ACTION_DRAG_EXITED:
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:

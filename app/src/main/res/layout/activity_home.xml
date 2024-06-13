@@ -101,18 +101,6 @@
         android:layout_weight="1"
         android:background="#EEEEEE">
 
-        <TextView
-            android:id="@+id/dayWon"
-            android:text=""
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:textColor="@android:color/black"
-            android:layout_marginStart="8dp"
-            android:gravity="center_vertical|start"/>
-
         <ImageView
             android:id="@+id/bin"
             android:layout_width="64dp"
@@ -121,6 +109,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             app:srcCompat="@drawable/lixeira3" />
+
+        <ImageView
+            android:id="@+id/dayWon"
+            android:layout_width="59dp"
+            android:layout_height="67dp"
+            app:srcCompat="@drawable/trophy" />
     </FrameLayout>
 
     <TextView
