@@ -106,9 +106,9 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void moveToWinActivity(CraftResponse response) {
         Intent intent = new Intent(HomeActivity.this, WinActivity.class);
-        intent.putExtra("DATE_LIST", dateList);
         intent.putExtra("SCORE", response.getGame().getScore());
         intent.putExtra("TIME", formatDuration(response.getGame().getTimeMillis()));
+        intent.putExtra("RANKING", response.getRanking());
         startActivity(intent);
         finish();
     }

@@ -2,9 +2,11 @@ package lab.prog.infinitecraftle;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import lab.prog.infinitecraftle.MyRankingAdapter;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import lab.prog.infinitecraftle.domain.RankingRow;
 import nl.dionsegijn.konfetti.core.Party;
 import nl.dionsegijn.konfetti.core.PartyFactory;
 import nl.dionsegijn.konfetti.core.emitter.Emitter;
@@ -37,15 +39,15 @@ public class WinActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int score = intent.getIntExtra("SCORE", 0);
         String time = intent.getStringExtra("TIME");
-
+        ArrayList<RankingRow> ranking = (ArrayList<RankingRow>) intent.getSerializableExtra("RANKING");
         // Set the score and time
         tvScore.setText("Pontuação: " + score);
         tvTime.setText("Tempo: " + time);
 
         // Set up the continue playing button
         buttonContinuePlaying.setOnClickListener(v -> {
-            Intent returnIntent = new Intent();
-            setResult(RESULT_OK, returnIntent);
+            Intent newIntent = new Intent(WinActivity.this, LoginActivity.class);
+            startActivity(newIntent);
             finish();
         });
 
@@ -68,5 +70,12 @@ public class WinActivity extends AppCompatActivity {
 
                         .build();
         konfettiView.start(party);
+
+        if (ranking != null) {
+            RecyclerView recyclerView = findViewById(R.id.recyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            MyRankingAdapter adapter = new MyRankingAdapter(ranking);
+            recyclerView.setAdapter(adapter);
+        }
     }
 }

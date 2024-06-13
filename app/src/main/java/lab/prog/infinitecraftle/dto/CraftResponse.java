@@ -1,7 +1,10 @@
 package lab.prog.infinitecraftle.dto;
 
+import java.util.ArrayList;
+
 import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.domain.Element;
+import lab.prog.infinitecraftle.domain.RankingRow;
 
 /**
  * Response class is used to send the response to the client.
@@ -16,7 +19,14 @@ public class CraftResponse {
     private Game game;
     private Element element;
     private boolean crafted;
+    private ArrayList<RankingRow> ranking;
+    public ArrayList<RankingRow> getRanking() {
+        return ranking;
+    }
 
+    public void setRanking(ArrayList<RankingRow> ranking) {
+        this.ranking = ranking;
+    }
     /**
      * Getter for error message
      * @return error message
