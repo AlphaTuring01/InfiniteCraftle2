@@ -412,7 +412,7 @@ public class HomeActivity extends AppCompatActivity {
             dateChanger.changeDate(user.getId(), item.getTitle().toString());
             SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
             preferencesHandler.setGameDate(this, item.getTitle().toString());
-            String a = preferencesHandler.getGameDate(this);
+            resetCraftingArea();
             return true;
         });
 
