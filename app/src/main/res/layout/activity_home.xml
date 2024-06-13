@@ -66,17 +66,17 @@
 
         <TextView
             android:id="@+id/wordView"
-            android:text="Palavra"
-            android:layout_width="0dp"
+            android:layout_width="263dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="0dp"
             android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_weight="1"
+            android:contentDescription="Centralized and Bigger TextView"
             android:gravity="center"
-            android:textSize="24sp"
-            android:textColor="@android:color/black"
             android:padding="16dp"
-            android:contentDescription="Centralized and Bigger TextView"/>
+            android:text="Palavra"
+            android:textColor="@android:color/black"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/wordViewDate"
@@ -91,27 +91,17 @@
             android:minHeight="48dp"
             android:text="Data"
             android:textColor="@android:color/black" />
+
     </LinearLayout>
 
     <!-- Main crafting area -->
+
     <FrameLayout
         android:id="@+id/crafting_area"
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:layout_weight="1"
         android:background="#EEEEEE">
-
-        <TextView
-            android:id="@+id/dayWon"
-            android:text=""
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:textColor="@android:color/black"
-            android:layout_marginStart="8dp"
-            android:gravity="center_vertical|start"/>
 
         <ImageView
             android:id="@+id/bin"
@@ -121,6 +111,15 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             app:srcCompat="@drawable/lixeira3" />
+
+        <ImageView
+            android:id="@+id/dayWon"
+            android:layout_width="75dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_height="69dp"
+            app:srcCompat="@drawable/trofeu" />
+
     </FrameLayout>
 
     <TextView

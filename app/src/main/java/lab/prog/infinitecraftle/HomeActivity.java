@@ -80,8 +80,8 @@ public class HomeActivity extends AppCompatActivity {
             wordView.setText(loginResponse.getGame().getTargetElement().getName());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
             dateView.setText(formatter.format(game.getDate()));
-            if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
-            else ((TextView) findViewById(R.id.dayWon)).setText("");
+            if(game.isWin()) ( findViewById(R.id.dayWon)).setVisibility(View.VISIBLE);
+            else (findViewById(R.id.dayWon)).setVisibility(View.INVISIBLE);
         }
         dateList = loginResponse.getListDates();
         elementList = game.getElements();
@@ -103,7 +103,7 @@ public class HomeActivity extends AppCompatActivity {
                 return;
             }
             Element element = craftResponse.getElement();
-            for(int i=0;i<craftingArea.getChildCount();i++){
+            for(int i = craftingArea.getChildCount() - 1; i > 0; i--){
                 View child = craftingArea.getChildAt(i);
                 if(child.getId() != newElementViewId) continue;
                 if(!(child instanceof TextView)) continue;
@@ -128,8 +128,8 @@ public class HomeActivity extends AppCompatActivity {
                 dateView.setText(formatter.format(game.getDate()));
                 elementList = game.getElements();
                 elementAdapter.notifyDataSetChanged();
-                if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
-                else ((TextView) findViewById(R.id.dayWon)).setText("");
+                if(game.isWin()) ( findViewById(R.id.dayWon)).setVisibility(View.VISIBLE);
+                else ( findViewById(R.id.dayWon)).setVisibility(View.INVISIBLE);
             }
         });
         dateChanger.getErrorLiveData().observe(this, error -> {
@@ -312,10 +312,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private boolean isCloseToOtherView(TextView view) {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
+            if(craftingArea.getChildAt(i).getId() == R.id.bin || craftingArea.getChildAt(i).getId() == R.id.dayWon) continue;
             View child = craftingArea.getChildAt(i);
             if(!(child instanceof TextView)) continue;
-            int a = child.getId();
-            int b = view.getId();
             if (child == view) continue;
             Rect rectDragged = new Rect((int) view.getX(), (int) view.getY(), (int) (view.getX() + child.getWidth()), (int) (view.getY() + child.getHeight()));
             Rect rectChild = new Rect((int) child.getX(), (int) child.getY(), (int) (child.getX() + child.getWidth()), (int) (child.getY() + child.getHeight()));
@@ -352,7 +351,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void resetCraftingArea() {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
-            if(craftingArea.getChildAt(i).getId() != R.id.bin) craftingArea.removeViewAt(i);
+            if(craftingArea.getChildAt(i).getId() != R.id.bin && craftingArea.getChildAt(i).getId() != R.id.dayWon) craftingArea.removeViewAt(i);
         }
     }
 
