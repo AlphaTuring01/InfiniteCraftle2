@@ -22,13 +22,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import lab.prog.infinitecraftle.domain.Element;
@@ -48,17 +48,18 @@ public class HomeActivity extends AppCompatActivity {
     private ChangeDateViewModel dateChanger;
 
     private FrameLayout craftingArea;
-
     private ImageView bin;
-    private LinearLayout elementsLayout;
-    private HorizontalScrollView elementsScrollView;
+    private RecyclerView elementsRecyclerView;
+    private ElementAdapter elementAdapter;
     private float initialX, initialY;
     private boolean isHorizontalDrag = false;
     private boolean isVerticalDrag = false;
 
     // Attributes for the current game
     private Game game;
+    private List<Element> elementList;
     private ArrayList<String> dateList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +68,10 @@ public class HomeActivity extends AppCompatActivity {
         craftViewModel = new ViewModelProvider(this).get(CraftViewModel.class);
         dateChanger = new ViewModelProvider(this).get(ChangeDateViewModel.class);
         craftingArea = findViewById(R.id.crafting_area);
-        elementsLayout = findViewById(R.id.elements_layout);
+        elementsRecyclerView = findViewById(R.id.elements_recycler_view);
         TextView wordView = findViewById(R.id.wordView);
         bin = findViewById(R.id.bin);
         TextView dateView = findViewById(R.id.wordViewDate);
-        elementsScrollView = findViewById(R.id.elements_scroll_view);
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
@@ -84,7 +84,12 @@ public class HomeActivity extends AppCompatActivity {
             else ((TextView) findViewById(R.id.dayWon)).setText("");
         }
         dateList = loginResponse.getListDates();
-        AddAllElements();
+        elementList = game.getElements();
+
+        // Set up the RecyclerView with a LinearLayoutManager for horizontal scrolling
+        elementsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        elementAdapter = new ElementAdapter(elementList, touchListener);
+        elementsRecyclerView.setAdapter(elementAdapter);
 
         Button buttonReset = findViewById(R.id.button_reset);
         buttonReset.setText("Limpar"); // Rename the reset button
@@ -105,7 +110,7 @@ public class HomeActivity extends AppCompatActivity {
                 String name = element.getName();
                 String emoji = element.getEmoji();
                 ((TextView)child).setText(emoji.concat(' ' + name));
-                addElement(emoji, name);
+                addElementToRecyclerView(element);
                 break;
             }
             if(craftResponse.getGame().isWin() && !game.isWin()){
@@ -121,7 +126,8 @@ public class HomeActivity extends AppCompatActivity {
                 wordView.setText(game.getTargetElement().getName());
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
                 dateView.setText(formatter.format(game.getDate()));
-                AddAllElements();
+                elementList = game.getElements();
+                elementAdapter.notifyDataSetChanged();
                 if(game.isWin()) ((TextView) findViewById(R.id.dayWon)).setText("Já ganhou");
                 else ((TextView) findViewById(R.id.dayWon)).setText("");
             }
@@ -135,6 +141,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
+
     private void moveToWinActivity(CraftResponse response) {
         Intent intent = new Intent(HomeActivity.this, WinActivity.class);
         intent.putExtra("SCORE", response.getGame().getScore());
@@ -143,6 +150,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
     public static String formatDuration(long millis) {
         long hours = TimeUnit.MILLISECONDS.toHours(millis);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60;
@@ -151,66 +159,29 @@ public class HomeActivity extends AppCompatActivity {
 
         return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     }
+
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
+
     private void logout() {
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         preferencesHandler.clearUserData(this);
         moveToLoginActivity();
     }
-    protected void AddAllElements(){
-        elementsLayout.removeAllViews(); // Clear all existing elements
-        for(Element e : game.getElements()){
-            addElement(e.getEmoji(), e.getName());
-        }
-    }
-    private void addElement(String emoji, String name) {
-        String elementText = emoji + " " + name;
-        // Verifica se o elemento já está presente
-        for (int i = 0; i < elementsLayout.getChildCount(); i++) {
-            View child = elementsLayout.getChildAt(i);
-            if (child instanceof TextView) {
-                TextView existingElement = (TextView) child;
-                if (existingElement.getText().toString().equals(elementText)) {
-                    return; // Elemento já está presente, não adiciona novamente
-                }
+
+    private void addElementToRecyclerView(Element element) {
+        for (Element existingElement : elementList) {
+            if (existingElement.getName().equals(element.getName())) {
+                return; // Element already exists, do not add again
             }
         }
-
-        // Cria um novo TextView para o elemento
-        TextView element = new TextView(this);
-        element.setText(elementText);
-        element.setPadding(20, 20, 20, 20);
-        element.setTextSize(18);
-        element.setTextColor(ContextCompat.getColor(this, android.R.color.black));
-        element.setGravity(View.TEXT_ALIGNMENT_CENTER);
-
-        // Define o contorno (borda) arredondada
-        int strokeWidth = 2; // Largura da borda em pixels
-        int strokeColor = ContextCompat.getColor(this, android.R.color.darker_gray); // Cor da borda
-        int cornerRadius = 20; // Raio dos cantos em pixels
-        GradientDrawable borderDrawable = new GradientDrawable();
-        borderDrawable.setStroke(strokeWidth, strokeColor);
-        borderDrawable.setColor(Color.WHITE); // Cor de fundo
-        borderDrawable.setCornerRadius(cornerRadius); // Raio dos cantos
-        element.setBackground(borderDrawable);
-
-        // Adiciona o TextView ao LinearLayout
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMarginStart(16);
-        layoutParams.setMarginEnd(16);
-        element.setLayoutParams(layoutParams);
-
-        element.setOnTouchListener(touchListener);
-        element.setId(newViewIndex);
-        newViewIndex++;
-        elementsLayout.addView(element);
+        elementList.add(element);
+        elementAdapter.notifyDataSetChanged();
     }
+
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -241,10 +212,10 @@ public class HomeActivity extends AppCompatActivity {
                         return true;
                     }
                     else if (isHorizontalDrag) {
-                        elementsScrollView.requestDisallowInterceptTouchEvent(false);
+                        elementsRecyclerView.requestDisallowInterceptTouchEvent(false);
                         return false;
                     } else if (isVerticalDrag) {
-                        elementsScrollView.requestDisallowInterceptTouchEvent(true);
+                        elementsRecyclerView.requestDisallowInterceptTouchEvent(true);
                         ClipData data = ClipData.newPlainText("", "");
                         View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                         v.startDragAndDrop(data, shadowBuilder, v, 0);
@@ -252,7 +223,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
 
                 case MotionEvent.ACTION_UP:
-                    elementsScrollView.requestDisallowInterceptTouchEvent(false);
+                    elementsRecyclerView.requestDisallowInterceptTouchEvent(false);
                     return true;
             }
             return false;
@@ -290,18 +261,16 @@ public class HomeActivity extends AppCompatActivity {
                     TextView clonedTextView = new TextView(this);
                     clonedTextView.setText(((TextView) view).getText());
                     clonedTextView.setTextSize(18);
-                    clonedTextView.setPadding(20, 20, 20, 20);// Increase text size
-                    int strokeWidth = 2; // Largura da borda em pixels
-                    int strokeColor = ContextCompat.getColor(this, android.R.color.darker_gray); // Cor da borda
-                    int cornerRadius = 20; // Raio dos cantos em pixels
+                    clonedTextView.setPadding(20, 20, 20, 20);
+                    int strokeWidth = 2;
+                    int strokeColor = ContextCompat.getColor(this, android.R.color.darker_gray);
+                    int cornerRadius = 20;
                     GradientDrawable borderDrawable = new GradientDrawable();
                     borderDrawable.setStroke(strokeWidth, strokeColor);
-                    borderDrawable.setColor(Color.WHITE); // Cor de fundo
-                    borderDrawable.setCornerRadius(cornerRadius); // Raio dos cantos
+                    borderDrawable.setColor(Color.WHITE);
+                    borderDrawable.setCornerRadius(cornerRadius);
                     clonedTextView.setBackground(borderDrawable);
-                    clonedTextView.setTextColor(Color.BLACK); // Cor de fundo
-
-                    //clonedTextView.setBackground(view.getBackground());
+                    clonedTextView.setTextColor(Color.BLACK);
 
                     FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -341,7 +310,6 @@ public class HomeActivity extends AppCompatActivity {
         return mainRect.intersect(binRect);
     }
 
-
     private boolean isCloseToOtherView(TextView view) {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             View child = craftingArea.getChildAt(i);
@@ -356,11 +324,12 @@ public class HomeActivity extends AppCompatActivity {
                 String view1Text = ((TextView)view).getText().toString();
                 String view2Text = ((TextView)child).getText().toString();
                 craftNewElement(view1Text, view2Text);
-                return true; // Return true if the rectangles overlap
+                return true;
             }
         }
-        return false; // Return false if no overlap is found
+        return false;
     }
+
     private void craftView(View view1, View view2) {
         craftingArea.removeView(view1);
         newElementViewId = view2.getId();

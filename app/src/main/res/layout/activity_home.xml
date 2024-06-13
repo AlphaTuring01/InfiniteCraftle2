@@ -7,11 +7,13 @@
     android:orientation="vertical"
     tools:context=".HomeActivity"
     android:background="#FFFFFF">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
+
         <ImageButton
             android:id="@+id/button_invisible"
             android:layout_width="48dp"
@@ -20,8 +22,8 @@
             android:layout_marginEnd="0dp"
             android:layout_marginTop="0dp"
             android:scaleType="fitCenter"
-            android:contentDescription="Logout"
-            />
+            android:contentDescription="Logout" />
+
         <ImageView
             android:id="@+id/ICIcon"
             android:scaleType="fitCenter"
@@ -31,6 +33,7 @@
             android:src="@drawable/logo"
             app:layout_constraintDimensionRatio="H,841:464"
             android:layout_marginTop="0dp"/>
+
         <ImageButton
             android:id="@+id/button_logout"
             android:layout_width="48dp"
@@ -40,9 +43,9 @@
             android:layout_marginEnd="12dp"
             android:layout_marginTop="0dp"
             android:scaleType="fitCenter"
-            android:contentDescription="Logout"
-            />
+            android:contentDescription="Logout" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -90,20 +93,13 @@
             android:textColor="@android:color/black" />
     </LinearLayout>
 
-
-
-
-
     <!-- Main crafting area -->
-
-    <!-- Drag elements to craft text -->
     <FrameLayout
         android:id="@+id/crafting_area"
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:layout_weight="1"
         android:background="#EEEEEE">
-
 
         <TextView
             android:id="@+id/dayWon"
@@ -135,23 +131,15 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@android:color/black"/>/>
+        android:textColor="@android:color/black"/>
 
     <!-- Horizontal scrollable container for elements -->
-    <HorizontalScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/elements_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:id="@+id/elements_scroll_view"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:id="@+id/elements_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"/>
-    </HorizontalScrollView>
+        android:orientation="horizontal"
+        android:scrollbars="horizontal" />
 
     <!-- Reset button -->
     <Button
