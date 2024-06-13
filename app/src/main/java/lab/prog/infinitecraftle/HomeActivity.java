@@ -384,7 +384,8 @@ public class HomeActivity extends AppCompatActivity {
     void craftNewElement(String parent1, String parent2){
         CraftRequest request = new CraftRequest(removeEmoji(parent1), removeEmoji(parent2));
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
-        request.setGameDate(preferencesHandler.getGameDate(this));
+        String date = preferencesHandler.getGameDate(this);
+        request.setGameDate(date);
         request.setUserId(preferencesHandler.getUser(this).getId());
         craftViewModel.craftElement(request);
     }
@@ -409,6 +410,9 @@ public class HomeActivity extends AppCompatActivity {
 
         popupMenu.setOnMenuItemClickListener(item -> {
             dateChanger.changeDate(user.getId(), item.getTitle().toString());
+            SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
+            preferencesHandler.setGameDate(this, item.getTitle().toString());
+            String a = preferencesHandler.getGameDate(this);
             return true;
         });
 

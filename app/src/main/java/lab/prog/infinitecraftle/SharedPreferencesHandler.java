@@ -20,7 +20,12 @@ public class SharedPreferencesHandler {
         user.setId(Integer.parseInt(idString));
         return user;
     }
-
+    public void setGameDate(Context context, String date) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_GAME_DATE, date);
+        editor.apply();
+    }
     public String getGameDate(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(KEY_GAME_DATE, null);
