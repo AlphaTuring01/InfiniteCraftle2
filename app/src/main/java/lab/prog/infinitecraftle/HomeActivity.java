@@ -50,7 +50,6 @@ public class HomeActivity extends AppCompatActivity {
     private FrameLayout craftingArea;
 
     private ImageView bin;
-    private FrameLayout rootLayout;
     private LinearLayout elementsLayout;
     private HorizontalScrollView elementsScrollView;
     private float initialX, initialY;
@@ -342,19 +341,6 @@ public class HomeActivity extends AppCompatActivity {
         return mainRect.intersect(binRect);
     }
 
-    private boolean isOff(View mainView) {
-        Rect mainRect = new Rect();
-        mainView.getGlobalVisibleRect(mainRect);
-
-        Rect craftingAreaRect = new Rect();
-        craftingArea.getGlobalVisibleRect(craftingAreaRect);
-
-        // Verifica se algum canto da mainView está fora do craftingArea
-        return mainRect.left < craftingAreaRect.left ||
-                mainRect.top < craftingAreaRect.top ||
-                mainRect.right > craftingAreaRect.right ||
-                mainRect.bottom > craftingAreaRect.bottom;
-    }
 
     private boolean isCloseToOtherView(TextView view) {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
