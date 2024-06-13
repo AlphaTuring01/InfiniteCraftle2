@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class Game implements Serializable {
     private int score;
-    private int timeMillis;
+    private long timeMillis;
     private boolean win;
     private ArrayList<Element> elements;
     private String date;
@@ -54,6 +54,9 @@ public class Game implements Serializable {
     }
     public void setDate(Date date) {
         DateToString(date);
+    }
+    public void setDateString(String date) {
+        this.date = date;
     }
     /**
      * Getter for date of the game
@@ -100,7 +103,7 @@ public class Game implements Serializable {
      * Getter for time of the game in milliseconds
      * @return time of the game in milliseconds
      */
-    public int getTimeMillis() {
+    public long getTimeMillis() {
         return timeMillis;
     }
 
@@ -108,7 +111,7 @@ public class Game implements Serializable {
      * Setter for time of the game in milliseconds
      * @param timeMillis time of the game in milliseconds
      */
-    public void setTimeMillis(int timeMillis) {
+    public void setTimeMillis(long timeMillis) {
         this.timeMillis = timeMillis;
     }
 

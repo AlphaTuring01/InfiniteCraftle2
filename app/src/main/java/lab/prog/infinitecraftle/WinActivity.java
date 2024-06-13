@@ -33,8 +33,6 @@ public class WinActivity extends AppCompatActivity {
         TextView tvScore = findViewById(R.id.tvScore);
         TextView tvTime = findViewById(R.id.tvTime);
         Button buttonContinuePlaying = findViewById(R.id.buttonContinuePlaying);
-        RecyclerView rvScores = findViewById(R.id.rvScores);
-
         // Get the score and time from the intent
         Intent intent = getIntent();
         int score = intent.getIntExtra("SCORE", 0);
@@ -70,17 +68,5 @@ public class WinActivity extends AppCompatActivity {
 
                         .build();
         konfettiView.start(party);
-
-        // Prepare the data for the scores
-        List<Score> scoreList = new ArrayList<>();
-        // Add sample scores, replace with real data as needed
-        scoreList.add(new Score("2024-06-10", 120));
-        scoreList.add(new Score("2024-06-11", 140));
-        scoreList.add(new Score("2024-06-12", 160));
-
-        // Set up the RecyclerView
-        rvScores.setLayoutManager(new LinearLayoutManager(this));
-        ScoreAdapter scoreAdapter = new ScoreAdapter(scoreList);
-        rvScores.setAdapter(scoreAdapter);
     }
 }

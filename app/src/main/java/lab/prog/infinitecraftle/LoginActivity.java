@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.domain.User;
 import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
@@ -55,7 +56,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginResponse.getError().isEmpty()) {
                     preferencesHandler.saveUserData(this,
                             loginResponse.getGame().getUser(),
-                            loginResponse.getGame().getDateString());
+                            loginResponse.getGame().getDateString()
+                            );
                     moveToHomeActivity(loginResponse);
                 } else {
                     errorText.setText(loginResponse.getError());

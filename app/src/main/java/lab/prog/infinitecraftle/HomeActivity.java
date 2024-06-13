@@ -22,6 +22,8 @@ import androidx.lifecycle.ViewModelProvider;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import lab.prog.infinitecraftle.domain.Element;
 import lab.prog.infinitecraftle.domain.Game;
 import lab.prog.infinitecraftle.dto.CraftRequest;
@@ -64,10 +66,12 @@ public class HomeActivity extends AppCompatActivity {
 
         craftingArea.setOnDragListener(dragListener);
         LoginResponse loginResponse = (LoginResponse) getIntent().getSerializableExtra("GAME_DATA");
-        wordView.setText(loginResponse.getElementDay().getName());
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
-        dateView.setText(formatter.format(new Date()));
         game = loginResponse.getGame();
+        if(loginResponse.getGame() != null){
+            wordView.setText(loginResponse.getGame().getTargetElement().getName());
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
+            dateView.setText(formatter.format(game.getDate()));
+        }
         dateList = loginResponse.getListDates();
         AddAllElements();
 
@@ -102,11 +106,19 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void moveToWinActivity(CraftResponse response) {
         Intent intent = new Intent(HomeActivity.this, WinActivity.class);
-        intent.putExtra("dateList", dateList);
-        intent.putExtra("score", response.getGame().getScore());
-        intent.putExtra("time", response.getGame().getTimeMillis());
+        intent.putExtra("DATE_LIST", dateList);
+        intent.putExtra("SCORE", response.getGame().getScore());
+        intent.putExtra("TIME", formatDuration(response.getGame().getTimeMillis()));
         startActivity(intent);
         finish();
+    }
+    public static String formatDuration(long millis) {
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60;
+        long milliseconds = millis % 1000;
+
+        return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     }
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
@@ -146,8 +158,8 @@ public class HomeActivity extends AppCompatActivity {
         element.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
         // Define o contorno (borda) arredondada
-        int strokeWidth = 3; // Largura da borda em pixels
-        int strokeColor = ContextCompat.getColor(this, android.R.color.black); // Cor da borda
+        int strokeWidth = 2; // Largura da borda em pixels
+        int strokeColor = ContextCompat.getColor(this, android.R.color.darker_gray); // Cor da borda
         int cornerRadius = 20; // Raio dos cantos em pixels
         GradientDrawable borderDrawable = new GradientDrawable();
         borderDrawable.setStroke(strokeWidth, strokeColor);
@@ -190,8 +202,14 @@ public class HomeActivity extends AppCompatActivity {
                             isVerticalDrag = true;
                         }
                     }
-
-                    if (isHorizontalDrag) {
+                    if (v.getParent() == craftingArea) {
+                        ClipData data = ClipData.newPlainText("", "");
+                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                        v.startDragAndDrop(data, shadowBuilder, v, 0);
+                        v.setVisibility(View.INVISIBLE);
+                        return true;
+                    }
+                    else if (isHorizontalDrag) {
                         elementsScrollView.requestDisallowInterceptTouchEvent(false);
                         return false;
                     } else if (isVerticalDrag) {
@@ -213,7 +231,9 @@ public class HomeActivity extends AppCompatActivity {
     private View.OnDragListener dragListener = (v, event) -> {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED:
+                return true;
             case DragEvent.ACTION_DRAG_ENTERED:
+                return true;
             case DragEvent.ACTION_DRAG_EXITED:
                 return true;
             case DragEvent.ACTION_DRAG_ENDED:
@@ -240,14 +260,15 @@ public class HomeActivity extends AppCompatActivity {
                     clonedTextView.setText(((TextView) view).getText());
                     clonedTextView.setTextSize(18);
                     clonedTextView.setPadding(20, 20, 20, 20);// Increase text size
-                    int strokeWidth = 3; // Largura da borda em pixels
-                    int strokeColor = ContextCompat.getColor(this, android.R.color.black); // Cor da borda
+                    int strokeWidth = 2; // Largura da borda em pixels
+                    int strokeColor = ContextCompat.getColor(this, android.R.color.darker_gray); // Cor da borda
                     int cornerRadius = 20; // Raio dos cantos em pixels
                     GradientDrawable borderDrawable = new GradientDrawable();
                     borderDrawable.setStroke(strokeWidth, strokeColor);
                     borderDrawable.setColor(Color.WHITE); // Cor de fundo
                     borderDrawable.setCornerRadius(cornerRadius); // Raio dos cantos
                     clonedTextView.setBackground(borderDrawable);
+                    clonedTextView.setTextColor(Color.BLACK); // Cor de fundo
 
                     //clonedTextView.setBackground(view.getBackground());
 
@@ -345,34 +366,6 @@ public class HomeActivity extends AppCompatActivity {
     private void resetCraftingArea() {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             craftingArea.removeViewAt(i);
-        }
-    }
-
-    // Add this method to start the WinActivity
-    private void startWinActivity(int score, String time) {
-        Intent intent = new Intent(HomeActivity.this, WinActivity.class);
-        intent.putExtra("SCORE", score);
-        intent.putExtra("TIME", time);
-        startActivityForResult(intent, WIN_ACTIVITY_REQUEST_CODE);
-    }
-
-    // Handle the result from WinActivity
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == WIN_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            // Handle returning to the game state
-        }
-    }
-    // Call this method when the user wins
-    private void checkForWin() {
-        // Your logic to check for win condition
-        boolean hasWon = true; // Replace this with your actual condition
-
-        if (hasWon) {
-            int score = 100; // Replace this with actual score calculation
-            String time = "00:10:00"; // Replace this with actual time calculation
-            startWinActivity(score, time);
         }
     }
 }
