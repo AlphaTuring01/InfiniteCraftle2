@@ -40,6 +40,10 @@ import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.ChangeDateViewModel;
 import lab.prog.infinitecraftle.viewmodel.CraftViewModel;
 
+
+/**
+ * Activity for the home screen.
+ */
 public class HomeActivity extends AppCompatActivity {
     private int newViewIndex = 10;
     private static final int WIN_ACTIVITY_REQUEST_CODE = 1;
@@ -60,6 +64,11 @@ public class HomeActivity extends AppCompatActivity {
     private List<Element> elementList;
     private ArrayList<String> dateList;
 
+   
+    /**
+     * Method to create the activity.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,6 +153,12 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to handle the result of an activity.
+     * @param requestCode The request code.
+     * @param resultCode The result code.
+     * @param data The data.
+     */
     private void moveToWinActivity(CraftResponse response) {
         Intent intent = new Intent(HomeActivity.this, WinActivity.class);
         intent.putExtra("SCORE", response.getGame().getScore());
@@ -153,6 +168,11 @@ public class HomeActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Method to format a duration in milliseconds to a string.
+     * @param millis The duration in milliseconds.
+     * @return The formatted string.
+     */
     public static String formatDuration(long millis) {
         long hours = TimeUnit.MILLISECONDS.toHours(millis);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60;
@@ -162,18 +182,28 @@ public class HomeActivity extends AppCompatActivity {
         return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     }
 
+    /**
+     * Method to move to the login activity.
+     */
     private void moveToLoginActivity() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
 
+    /**
+     * Method to log out.
+     */
     private void logout() {
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
         preferencesHandler.clearUserData(this);
         moveToLoginActivity();
     }
 
+    /**
+     * Method to add an element to the RecyclerView.
+     * @param element The element to add.
+     */
     private void addElementToRecyclerView(Element element) {
         for (Element existingElement : elementList) {
             if (existingElement.getName().equals(element.getName())) {
@@ -184,6 +214,9 @@ public class HomeActivity extends AppCompatActivity {
         elementAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Listener for touch events.
+     */
     private View.OnTouchListener touchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -232,6 +265,9 @@ public class HomeActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Listener for drag events.
+     */
     private View.OnDragListener dragListener = (v, event) -> {
         switch (event.getAction()) {
             case DragEvent.ACTION_DRAG_STARTED:
@@ -302,6 +338,11 @@ public class HomeActivity extends AppCompatActivity {
         return true;
     };
 
+    /**
+     * Method to check if a view is in the bin.
+     * @param mainView The view to check.
+     * @return True if the view is in the bin, false otherwise.
+     */
     private boolean isInBin(View mainView) {
         Rect mainRect = new Rect();
         mainView.getGlobalVisibleRect(mainRect);
@@ -312,6 +353,11 @@ public class HomeActivity extends AppCompatActivity {
         return mainRect.intersect(binRect);
     }
 
+    /**
+     * Method to check if a view is close to another view.
+     * @param view The view to check.
+     * @return True if the view is close to another view, false otherwise.
+     */
     private boolean isCloseToOtherView(TextView view) {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             if(craftingArea.getChildAt(i).getId() == R.id.bin || craftingArea.getChildAt(i).getId() == R.id.dayWon) continue;
@@ -331,6 +377,11 @@ public class HomeActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * Method to craft a new element.
+     * @param view1 The first view.
+     * @param view2 The second view.
+     */
     private void craftView(View view1, View view2) {
         craftingArea.removeView(view1);
         newElementViewId = view2.getId();
@@ -338,6 +389,11 @@ public class HomeActivity extends AppCompatActivity {
         view2.setY((view1.getY() + view2.getY())/2);
     }
 
+    /**
+     * Method to craft a new element.
+     * @param parent1 The first parent.
+     * @param parent2 The second parent.
+     */
     void craftNewElement(String parent1, String parent2){
         CraftRequest request = new CraftRequest(removeEmoji(parent1), removeEmoji(parent2));
         SharedPreferencesHandler preferencesHandler = new SharedPreferencesHandler();
@@ -347,16 +403,28 @@ public class HomeActivity extends AppCompatActivity {
         craftViewModel.craftElement(request);
     }
 
+    /**
+     * Method to remove the emoji from a string.
+     * @param input The input string.
+     * @return The string without the emoji.
+     */
     public static String removeEmoji(String input) {
         return input.trim().split("\\s+")[1];
     }
 
+    /**
+     * Method to reset the crafting area.
+     */
     private void resetCraftingArea() {
         for(int i = craftingArea.getChildCount() - 1; i > 0; i--) {
             if(craftingArea.getChildAt(i).getId() != R.id.bin && craftingArea.getChildAt(i).getId() != R.id.dayWon) craftingArea.removeViewAt(i);
         }
     }
 
+    /**
+     * Method to show the date dropdown.
+     * @param dateView The date view.
+     */
     private void showDateDropdown(TextView dateView) {
         SharedPreferencesHandler handler = new SharedPreferencesHandler();
         User user = handler.getUser(this);

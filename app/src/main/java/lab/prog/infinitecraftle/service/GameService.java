@@ -16,17 +16,29 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
+/**
+ * GameService class is used to send the game requests to the server.
+ * It uses the OkHttpClient to send the requests and the Gson library to parse the responses.
+ */
 public class GameService {
 
     private static final String BASE_URL = "http://172.15.1.60:8000/api/";
     private final OkHttpClient client;
     private final Gson gson;
 
+    /**
+     * Constructor for GameService.
+     */
     public GameService() {
         client = new OkHttpClient();
         gson = new Gson();
     }
 
+    /**
+     * Method to send a craft request to the server.
+     * @param craftRequest The craft request.
+     * @param callback The callback to be called when the response is received.
+     */
     public void craftElement(CraftRequest craftRequest, ResponseCallback<CraftResponse> callback) {
         String urlString = BASE_URL + "craft";
         String requestBody = "{\"userId\":" + craftRequest.getUserId() + ",\"gameDate\":\"" +
@@ -55,6 +67,13 @@ public class GameService {
             }
         });
     }
+
+    /**
+     * Method to send a change date request to the server.
+     * @param userId The user id.
+     * @param date The date.
+     * @param callback The callback to be called when the response is received.
+     */
     public void changeDate(int userId, String date, ResponseCallback<ChangeDateResponse> callback) {
         String urlString = BASE_URL + "change-date?userId=" + userId + "&" + "date=" + date;
         Request request = new Request.Builder()
@@ -79,7 +98,10 @@ public class GameService {
         });
     }
 
-
+    /**
+     * Interface to handle the response from the server.
+     * @param <T> The type of the response.
+     */
     public interface ResponseCallback<T> {
         void onResponse(T response);
         void onFailure(Exception e);

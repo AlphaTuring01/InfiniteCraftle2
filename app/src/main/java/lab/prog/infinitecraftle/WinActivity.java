@@ -25,8 +25,17 @@ import nl.dionsegijn.konfetti.core.models.Shape;
 import nl.dionsegijn.konfetti.core.models.Size;
 import nl.dionsegijn.konfetti.xml.KonfettiView;
 
+
+
+/**
+ * Activity for the win screen.
+ */
 public class WinActivity extends AppCompatActivity {
 
+    /**
+     * Method to create the activity.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

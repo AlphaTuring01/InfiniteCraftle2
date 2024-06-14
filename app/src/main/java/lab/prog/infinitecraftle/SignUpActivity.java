@@ -12,9 +12,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import lab.prog.infinitecraftle.viewmodel.SignUpViewModel;
 
+
+/**
+ * Activity for signing up.
+ */
 public class SignUpActivity extends AppCompatActivity {
     private SignUpViewModel signUpViewModel;
 
+    /**
+     * Method to create the activity.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +66,9 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to move to the login activity.
+     */
     private void moveToLoginActivity() {
         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
         startActivity(intent);

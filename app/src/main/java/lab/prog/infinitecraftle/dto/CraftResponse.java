@@ -24,6 +24,10 @@ public class CraftResponse {
         return ranking;
     }
 
+    /**
+     * Setter for ranking
+     * @param ranking
+     */
     public void setRanking(ArrayList<RankingRow> ranking) {
         this.ranking = ranking;
     }

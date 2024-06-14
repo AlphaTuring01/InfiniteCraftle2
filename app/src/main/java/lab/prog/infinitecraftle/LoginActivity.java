@@ -19,9 +19,17 @@ import lab.prog.infinitecraftle.domain.User;
 import lab.prog.infinitecraftle.dto.LoginResponse;
 import lab.prog.infinitecraftle.viewmodel.LoginViewModel;
 
+
+/**
+ * Activity for logging in.
+ */
 public class LoginActivity extends AppCompatActivity {
     private LoginViewModel loginViewModel;
 
+    /**
+     * Method to create the activity.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +81,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to handle the login.
+     * @param username The username.
+     * @param password The password.
+     */
     private void handleLogin(String username, String password) {
         if (!username.isEmpty() && !password.isEmpty()) {
             loginViewModel.login(username, password);
@@ -81,6 +94,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Method to move to the home activity.
+     * @param loginResponse The login response.
+     */
     private void moveToHomeActivity(LoginResponse loginResponse) {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.putExtra("GAME_DATA", loginResponse);
